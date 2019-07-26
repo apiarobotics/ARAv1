@@ -7,7 +7,7 @@ ENV LANG fr_FR.UTF-8
 RUN apt-get update && apt-get install -y \
     && rm -rf /var/likb/apt/lists/*
 
-COPY . /root/
+COPY ../ROS /root/
 
 WORKDIR /root/catkin_ws
 
