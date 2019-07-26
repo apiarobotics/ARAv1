@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t ros:ros_capture .
+docker build -t local/ros:node_capture .
