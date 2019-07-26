@@ -14,7 +14,7 @@ RUN ls -la
 
 WORKDIR /root
 ADD run_on_start.sh /root/
-RUN sudo sh run_on_start.sh
+RUN sh run_on_start.sh
 
 WORKDIR /root/catkin_ws
 RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make'
