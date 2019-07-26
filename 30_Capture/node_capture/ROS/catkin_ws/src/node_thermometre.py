@@ -1,20 +1,19 @@
 #!/usr/bin/env python
-# license removed for brevity
 import rospy
 from std_msgs.msg import String
 
-def gps():
-    pub = rospy.Publisher('le GPS', String, queue_size=10)
-    rospy.init_node('gps', anonymous=True)
+def thermometre():
+    pub = rospy.Publisher('temperature', String, queue_size=10)
+    rospy.init_node('capture_temperature', anonymous=True)
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
-        hello_str = "Coordonnées GPS: %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
+        output_str = "La température est de: %s" % rospy.get_time()
+        rospy.loginfo(ouput_str)
+        pub.publish(output_str)
         rate.sleep()
 
 if __name__ == '__main__':
     try:
-        gps()
+        thermometre()
     except rospy.ROSInterruptException:
         pass
