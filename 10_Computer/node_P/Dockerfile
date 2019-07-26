@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install locales
 RUN locale-gen fr_FR.UTF-8
 ENV LANG fr_FR.UTF-8
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y net-tools iputils-ping\
     && rm -rf /var/likb/apt/lists/*
 
 RUN mkdir -p /root/catkin_ws/src

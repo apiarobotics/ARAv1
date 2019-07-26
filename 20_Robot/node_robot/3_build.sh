@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /~/ARAv1/20_Robot/node_robot/
-docker build -t ARAv1/node_roscore:0.1 .
+sudo docker build -t arav1/node_robot:0.1 .
