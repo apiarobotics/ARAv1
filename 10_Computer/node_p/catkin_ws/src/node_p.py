@@ -12,9 +12,9 @@ def P():
     # anonymous=True flag means that rospy will choose a unique
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
-    rospy.init_node('Physical manager', anonymous=True)
+    rospy.init_node('Physical_manager', anonymous=True)
 
-    rospy.Subscriber("robot", String, callback)
+    rospy.Subscriber("capture_temperature", String, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()

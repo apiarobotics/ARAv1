@@ -10,10 +10,9 @@ def thermometre():
     rate = rospy.Rate(10) # 10hz
 
     while not rospy.is_shutdown():
-        humidity, temperature = Adafruit_DHT.read_retry(11,4)
+        humidity, temperature = Adafruit_DHT.read_retry(11,17)
 
-        output_str = 'Temp: {0:0.1f} C Humidity: {1:0.1f} %'.format(temperature, humidity)
-#        output_str = "La température est de: %s" % rospy.get_time()
+        output_str = str(temperature) 
         rospy.loginfo(ouput_str)
         pub.publish(output_str)
         rate.sleep()
