@@ -14,5 +14,4 @@ WORKDIR /root/catkin_ws
 RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make'
 RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; source devel/setup.bash'
 
-ENV NODE_NAME node_p
 RUN /bin/bash -c '. source catkin_deploy.sh' 

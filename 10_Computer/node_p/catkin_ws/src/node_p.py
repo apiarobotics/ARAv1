@@ -5,7 +5,7 @@ from std_msgs.msg import String
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "Physical manager catchs: %s", data.data)
     
-def P():
+def p():
 
     # In ROS, nodes are uniquely named. If two nodes with the same
     # name are launched, the previous one is kicked off. The
@@ -20,4 +20,4 @@ def P():
     rospy.spin()
 
 if __name__ == '__main__':
-    P()
+    p()
