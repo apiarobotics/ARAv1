@@ -1,21 +1,29 @@
 #!/bin/bash
+source config
 
-export ROS_MASTER_URI="http://172.18.0.2:11311/"
-export NODE_NAME=$(cat node_name)
-export NODE_VERSION=$(cat node_version)
+export $ROS_MASTER_URI"
+export $NODE_NAME
+export $NODE_VERSION
 
-cd catkin_ws
+cd catkin_ws/
 pwd
 
 source /opt/ros/melodic/setup.bash
 catkin_make
 source devel/setup.bash
 
-cd src
+cd src/
 pwd
 catkin_create_pkg $NODE_NAME std_msgs rospy
-
 mv *.py $NODE_NAME/src/
 chmod +x $NODE_NAME/src/.
+
+cd ../
+catkin_make install
+source devel/setup.bash
+
+cd src/
+rosrun $NODE_NAME $ROSRUN_EXE
+
 
 echo "done"

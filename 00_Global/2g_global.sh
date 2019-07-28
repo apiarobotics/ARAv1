@@ -1,19 +1,14 @@
 #!/bin/bash
+source config
 
-echo "copy all commons files to node directory:"
-echo ""
+echo "~~~~~~~ Config vars:"
+echo "node_name = " $NODE_NAME
+echo "node_version = " $NODE_VERSION
+echo "~~~~~~~~~~~~~~~~~~~~"
 
-sh ../../init.sh
+while read p; do
+    export $p
+done <config 
 
 chmod +x ./*
-
-ls -la ./
-
-export NODE_NAME=$(cat node_name)
-echo "node name:" $NODE_NAME
-
-export NODE_VERSION=$(cat node_version)
-echo "node version:" $NODE_VERSION
-
-echo "copy commons ends"
-echo ""
+#ls -la ./

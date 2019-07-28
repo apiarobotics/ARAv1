@@ -1,0 +1,7 @@
+NODE_NAME="node_swarm"
+NODE_VERSION="0.1"
+NODE_IP=""
+ROS_MASTER_URI="http://172.18.0.2:11311/"
+SWARM_MANAGER_IP=""
+SWARM_WORKER_IP=""
+ROSRUN_EXE="node_swarm.py"
