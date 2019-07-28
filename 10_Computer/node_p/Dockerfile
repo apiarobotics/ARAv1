@@ -9,10 +9,4 @@ RUN apt-get install -y net-tools iputils-ping\
 
 WORKDIR /root
 ADD ./ /root
-RUN ls -la
 
-WORKDIR /root/catkin_ws
-RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make'
-RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; source devel/setup.bash'
-
-RUN /bin/bash -c '. source c6_deploy.sh' 

@@ -3,7 +3,10 @@
 echo "copy all commons files to node directory:"
 echo ""
 
-cp -r ../../00_Common/. ./
+sh ../../init.sh
+
+chmod +x ./*
+
 ls -la ./
 
 export NODE_NAME=$(cat node_name)

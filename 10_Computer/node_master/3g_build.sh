@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export NODE_NAME=$(cat node_name)
+export NODE_VERSION=$(cat node_version)
+
 echo "docker build : node_name = $NODE_NAME , node_version = $NODE_VERSION"
 echo ""
 
