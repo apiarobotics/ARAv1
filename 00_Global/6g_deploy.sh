@@ -1,7 +1,7 @@
 #!/bin/bash
 source config
 
-export $ROS_MASTER_URI"
+export $ROS_MASTER_URI
 export $NODE_NAME
 export $NODE_VERSION
 

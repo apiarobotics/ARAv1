@@ -2,4 +2,4 @@
 
 rm -rf [1-9]g*
 rm -rf Dockerfile
-ln -s ../../00_Global/* ./
+ln -s ../../00_Global/[1-5][g]* ./
