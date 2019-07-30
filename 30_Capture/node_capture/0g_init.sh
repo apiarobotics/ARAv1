@@ -1,1 +1,0 @@
-../../00_Global/0g_init.sh

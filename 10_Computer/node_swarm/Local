@@ -1,0 +1,6 @@
+GLOBAL_PATH="../../00_Global"
+NODE_NAME="node_swarm"
+NODE_VERSION="0.1"
+NODE_IP=""
+SWARM_WORKER_IP=""
+ROSRUN_EXE=""

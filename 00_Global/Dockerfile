@@ -8,6 +8,4 @@ RUN apt-get install -y net-tools iputils-ping\
     && rm -rf /var/likb/apt/lists/*
 
 WORKDIR /root
-ADD 6g_deploy.sh ./
-ADD config ./ 
-ADD catkin_ws ./
+ADD ./ ./

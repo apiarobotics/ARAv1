@@ -1,0 +1,1 @@
+../../00_Global/0g_install.sh
