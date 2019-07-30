@@ -17,7 +17,7 @@ clear
 ########################################################################
 
 echo " *************************************************** "
-echo " ***  Welcome to $APP_NAME/$NODE_NAME:$NODE_VERSION installation program  *** "
+echo " ***  Welcome to $APP_NAME:$APP_VERSION/$NODE_NAME:$NODE_VERSION installation program  *** "
 echo " *************************************************** "
 echo "#### please refer to apiarobotics.com to get informed for $APP_NAME updates or new services"
 
@@ -37,6 +37,8 @@ echo " - - ROSRUN_EXE=$ROSRUN_EXE"
 echo "#### Param values from Global are: "
 echo " - - APP_NAME=$APP_NAME"
 echo " - - APP_VERSION=$APP_VERSION"
+echo " - - REPO_NAME=$REPO_NAME"
+echo " - - NET_NAME=$NET_NAME"
 echo " - - APP_SUBNET=$APP_SUBNET"
 echo " - - ROS_MASTER_URI=$ROS_MASTER_URI"
 echo " - - SWARM_MANAGER_IP=$SWARM_MANAGER_IP"
@@ -96,15 +98,15 @@ DEFAULT="N"
 read -e -p "Create overlay network ? [N/y/q] ": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
 if [ "${PROCEED}" == "y" ] ; then 
-    echo ":::: Docker: Create overlay network named '$APP_NAME'"
-    sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $APP_NAME
+    echo ":::: Docker: Create overlay network named '$NET_NAME'"
+    sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME
 
-    echo ":::: Docker: Create overlay network named 'ara-ingress'"
+    echo ":::: Docker: Create overlay network named '$NET_NAME-ingress'"
     docker network create \
     --driver overlay \
     --ingress \
     --opt com.docker.network.driver.mtu=1200 \
-    ara-ingress
+    $NET_NAME-ingress
 
 else
     echo "#### Network creation aborded !"
