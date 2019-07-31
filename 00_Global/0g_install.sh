@@ -91,26 +91,47 @@ echo $CONSOLE_HL
 
 
 ########################################################################
-# Create overlay network 
+# Create overlay network and check network name already exists 
 ########################################################################
 
 DEFAULT="N"
-read -e -p "Create overlay network ? [N/y/q] ": PROCEED
+read -e -p ":::: Create overlay network ? [N/y/q] ": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
 if [ "${PROCEED}" == "y" ] ; then 
-    echo ":::: Docker: Create overlay network named '$NET_NAME'"
-    sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME
+    NET_ACT="create"
 
-    echo ":::: Docker: Create overlay network named '$NET_NAME-ingress'"
-    docker network create \
-    --driver overlay \
-    --ingress \
-    --opt com.docker.network.driver.mtu=1200 \
-    $NET_NAME-ingress
+    NET_CHECK=$(docker network inspect $NET_NAME --format {{.Name}})
+
+    #### check if network with same name already exixts
+    if [ $NET_CHECK == $NET_NAME ]; then
+        DEFAULT="N"
+
+        #### ask user what to do: delete and create or abort ? 
+        read -e -p ":::: Network $NET_NAME already exists, delete and recreate (y) or abort this step (N) ?": PROCEED
+        PROCEED="${PROCEED:-${DEFAULT}}"
+
+        #### if user wants to remove network then create it
+        if [ "${PROCEED}" == "y" ] ; then 
+            echo ">>>> Docker: Removing network named '$NET_NAME'"
+            echo "#### Docker network: $(docker network rm $NET_NAME) removed !" 
+            NET_ACT="create"
+        #### else user wants to abort process
+        else
+            NET_ACT="abort"
+            echo "#### Network creation aborded !"
+        fi
+   fi 
+
+   #### if request is create the network
+   if [ $NET_ACT == "create" ]; then
+       echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
+       echo "#### Docker network: $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME)"
+   fi
 
 else
     echo "#### Network creation aborded !"
 fi
+
 echo $CONSOLE_HL 
 
 

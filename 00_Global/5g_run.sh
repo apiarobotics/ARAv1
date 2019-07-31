@@ -23,6 +23,9 @@ echo "#### NODE_IP=$NODE_IP"
 echo "#### DOCKER_CMD=$DOCKER_CMD"
 
 
+echo "sudo docker run $DOCKER_RUN --net $NET_NAME --ip $NODE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION $DOCKER_CMD"
+
+
 sudo docker run \
  $DOCKER_RUN \
  --net $NET_NAME \

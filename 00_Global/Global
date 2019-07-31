@@ -1,11 +1,10 @@
 APP_NAME="ARAv1"
 APP_VERSION="0.1"
 REPO_NAME="arav1"
-NET_NAME="ara-ntw"
+NET_NAME="ara_ntw"
 APP_SUBNET="192.168.0.80/28"
 ROS_MASTER_URI="http://192.168.0.81:11311/"
 SWARM_MANAGER_IP="192.168.0.81"
-DOCKER_CMD="6g_deploy.sh"
 CONSOLE_BR="...."
 CONSOLE_HL="~~~~~~~~~~~~~~~~~~~~~"
 
