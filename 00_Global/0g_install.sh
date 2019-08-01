@@ -139,7 +139,7 @@ echo $CONSOLE_HL
 # Run 1g_update to create simlinks and copy files to local for first time 
 ########################################################################
 
-DEFAULT="N"
+DEFAULT="y"
 read -e -p "Run 1g_update program to update files on local ? [N/y/q] ": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
 if [ "${PROCEED}" == "y" ] ; then 
