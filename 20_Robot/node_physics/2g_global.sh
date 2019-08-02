@@ -1,0 +1,1 @@
+../../00_Global/2g_global.sh

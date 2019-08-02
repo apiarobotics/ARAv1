@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+
+DEFAULT="q"
+read -e -p " \
+Hardware role ? \r \
+[1] : Computer (Core and brain) \r \ 
+[2] : Robot manager \r \ 
+[3] : Capture manager \r \ 
+[4] : Bodies manager \r \ 
+[5] : Frames manager \r \ 
+[6] : Store manager \r \ 
+[q] : quit build program (and terminate current script execution)
+": PROCEED
+PROCEED="${PROCEED:-${DEFAULT}}"
+
+case "$PROCEED" in
+	1)
+		BUILD_PATH="10_Computer"
+		;;
+	2)
+		BUILD_PATH="20_Robot"
+		;;
+	3)
+		BUILD_PATH="30_Capture"
+		;;
+	4)
+		BUILD_PATH="40_Bodies"
+		;;
+	5)
+		BUILD_PATH="50_Frames"
+		;;
+	6)
+		BUILD_PATH="60_Store"
+		;;
+
+	*)
+
+		exit 1
+esac
+
+
+
+if [ $PROCEED == [1-6]; then
+	echo ">>>> Starting installation program"
+	cd $BUILD_PATH/
+	echo $(pwd)
+	sudo bash ./install
+else
+        echo "#### invalid entry, please relaunch program after terminating"
+fi
+
+echo "#### installation aborded !"
+
+
+

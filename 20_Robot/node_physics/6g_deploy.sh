@@ -1,0 +1,1 @@
+../../00_Global/6g_deploy.sh

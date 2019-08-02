@@ -1,0 +1,5 @@
+NODE_NAME="node_p"
+NODE_VERSION="0.1"
+NODE_IP=""
+SWARM_WORKER_IP=""
+ROSRUN_EXE="node_p.py"
