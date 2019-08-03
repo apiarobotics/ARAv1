@@ -2,14 +2,14 @@
 
 
 DEFAULT="q"
-read -e -p " \
-Hardware role ? \r \
-[1] : Computer (Core and brain) \r \ 
-[2] : Robot manager \r \ 
-[3] : Capture manager \r \ 
-[4] : Bodies manager \r \ 
-[5] : Frames manager \r \ 
-[6] : Store manager \r \ 
+read -e -p "
+Current hardware role ?    
+[1] : Computer (Master, Logics, Database) 
+[2] : Robot manager (Physics, Robot) 
+[3] : Capture manager 
+[4] : Bodies manager  
+[5] : Frames manager  
+[6] : Store manager  
 [q] : quit build program (and terminate current script execution)
 ": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
@@ -39,9 +39,7 @@ case "$PROCEED" in
 		exit 1
 esac
 
-
-
-if [ $PROCEED == [1-6]; then
+if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
 	echo ">>>> Starting installation program"
 	cd $BUILD_PATH/
 	echo $(pwd)

@@ -1,5 +1,0 @@
-NODE_NAME="node_robot"
-NODE_VERSION="0.1"
-NODE_IP=""
-SWARM_WORKER_IP=""
-ROSRUN_EXE="rosrun node_robot node_robot.py"

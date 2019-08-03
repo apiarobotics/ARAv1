@@ -1,5 +1,5 @@
 GLOBAL_PATH="../../00_Global"
-NODE_NAME="node_master"
+NODE_NAME="11master"
 NODE_ROLE="master"
 NODE_VERSION="0.1"
 NODE_IP="192.168.0.81"

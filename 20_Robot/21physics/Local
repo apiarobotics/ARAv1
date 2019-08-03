@@ -1,0 +1,11 @@
+GLOBAL_PATH="../../00_Global"
+NODE_NAME="21physics"
+NODE_ROLE="physics"
+NODE_VERSION="0.1"
+NODE_IP="192.168.0.82"
+SWARM_WORKER_IP=""
+DOCKER_RUN=" --privileged -it --rm"
+DOCKER_CMD="6g_exec.sh"
+CATKIN="Yes"
+ROSRUN_EXE="node_physics.py"
+
