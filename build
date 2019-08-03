@@ -1,54 +1,42 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
+##############################################################################
+#Autor: Adrien Beaudrey
+#Version: 0.1
+#Date: 2019.08.03
+#Title: Build
+#Purpose: Run subdirectories deployment scripts, for each node existing for the "role" (ARA: Apiary Robotic Assistant)
+#Site: https://apiarobotics.com
+#
+#
+##############################################################################
 
-DEFAULT="q"
-read -e -p "
-Current hardware role ?    
-[1] : Computer (Master, Logics, Database) 
-[2] : Robot manager (Physics, Robot) 
-[3] : Capture manager 
-[4] : Bodies manager  
-[5] : Frames manager  
-[6] : Store manager  
-[q] : quit build program (and terminate current script execution)
-": PROCEED
-PROCEED="${PROCEED:-${DEFAULT}}"
+#for each node, run install process
+#for i in `find . -type d -name '[1-9]*'` ;do
 
-case "$PROCEED" in
-	1)
-		BUILD_PATH="10_Computer"
-		;;
-	2)
-		BUILD_PATH="20_Robot"
-		;;
-	3)
-		BUILD_PATH="30_Capture"
-		;;
-	4)
-		BUILD_PATH="40_Bodies"
-		;;
-	5)
-		BUILD_PATH="50_Frames"
-		;;
-	6)
-		BUILD_PATH="60_Store"
-		;;
+# go to "role" folder:
+cd $ROLE/
+#echo $(pwd)
 
-	*)
-
-		exit 1
-esac
-
-if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
-	echo ">>>> Starting installation program"
-	cd $BUILD_PATH/
-	echo $(pwd)
-	sudo bash ./install
-else
-        echo "#### invalid entry, please relaunch program after terminating"
-fi
-
-echo "#### installation aborded !"
-
-
-
+# for each folder (node) inside role root folder: 
+for i in [1-9]*; do
+	echo "Node $i"
+	echo ""
+	# test folder is patern validated:
+	#if [[ "$i" =~ [â-zA-Zà-9\ ] ]]; then
+		# yes folder name follows patern
+    		DEFAULT="N"
+    		read -e -p "Proceed $i installation ? [N/y/q]:" PROCEED
+    		PROCEED="${PROCEED:-${DEFAULT}}"
+    		if [ "${PROCEED}" == "y" ] ; then
+        		echo ">>>> Node $i: Installing"
+			cd $i/
+			echo $(pwd)
+			source ./Local
+			/bin/bash $GLOBAL_PATH/0g_install.sh
+        		echo "#### Node $i: Installation done"
+    		else
+        		echo "#### Installation $i aborded !"
+    		fi
+	#fi
+done

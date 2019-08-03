@@ -44,7 +44,9 @@ echo " - - ROS_MASTER_URI=$ROS_MASTER_URI"
 echo " - - SWARM_MANAGER_IP=$SWARM_MANAGER_IP"
 
 echo $CONSOLE_HL 
-
+echo $(pwd)
+echo $(whoami)
+echo ""
 
 ########################################################################
 # Check Docker installation and install Docker if needed
@@ -52,7 +54,8 @@ echo $CONSOLE_HL
 
 echo ":::: Checking prerequisites: Docker"
 
-command -v docker >/dev/null
+dpkg -l | grep docker-engine >/dev/null
+#command -v docker >/dev/null
 if [ $? -eq 0 ] ; then
     echo "#### $(docker -v) is already installed: OK"
 else
