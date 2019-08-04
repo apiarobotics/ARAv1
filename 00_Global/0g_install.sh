@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 #### #### #### #### #### #### #### ####
+# DO NOT RUN this program direclty, it must be call by build based on root folder
 # IMPORTANT: Nothing has to be setup here, except 2 vars if software binaries structure has changed
 ROOT_PATH="./"
 GLOBAL_PATH="00_Global/"
