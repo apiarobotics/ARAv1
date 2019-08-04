@@ -34,6 +34,33 @@ clear
 #++++++++++ PROGRAM FUNCTIONS 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+pushNetwork (){
+	
+	ROLE=$1
+	NET_PATH=$2
+	
+	sudo chmod 777 /etc/hosts
+	sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
+	
+	echo "#### Network values from $NET_PATH are: "
+        while IFS='' read -r line || [[ -n "$line" ]]; do
+            echo "#### $line"
+			VAR_NAME="${line%%=*}"
+			temp="${line%=}"
+			temp2="${temp##*=}"
+			temp3="${temp2%\"}"
+			temp4="${temp3#\"}"
+			VAR_DATA=$temp4
+			export $VAR_NAME="$VAR_DATA"
+			#echo $VAR_NAME"="$VAR_DATA
+			
+			sudo echo "$VAR_NAME $VAR_DATA" >> /etc/hosts
+					
+        done < "$VARS_PATH"
+	
+	sudo chmod 644 /etc/hosts
+}
+
 getVars (){
     # 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
     
@@ -51,21 +78,21 @@ getVars (){
         echo "#### Param values from $VARS_PATH are: "
         while IFS='' read -r line || [[ -n "$line" ]]; do
             echo "#### $line"
-	    VAR_NAME="${line%%=*}"
-	    temp="${line%=}"
-	    temp2="${temp##*=}"
-	    temp3="${temp2%\"}"
-            temp4="${temp3#\"}"
-	    VAR_DATA=$temp4
-	    export $VAR_NAME="$VAR_DATA"
-	    #echo $VAR_NAME"="$VAR_DATA
+			VAR_NAME="${line%%=*}"
+			temp="${line%=}"
+			temp2="${temp##*=}"
+			temp3="${temp2%\"}"
+			temp4="${temp3#\"}"
+			VAR_DATA=$temp4
+			export $VAR_NAME="$VAR_DATA"
+			#echo $VAR_NAME"="$VAR_DATA
+					
         done < "$VARS_PATH"
 
     else
-        echo "!!!!!!!!!! $VARS file not found, install aborded !"
+        echo "!!!!!!!!!! $VARS_PATH file not found, install aborded !"
 
     fi
-    
 }
 
 checkPrereq (){
@@ -328,7 +355,7 @@ fi
 
 
 #############################
-# Deploy role 
+# Deploy host role 
 #############################
 
 #### go to "role" folder and run "build" script
@@ -339,11 +366,18 @@ if [[ $ROLE ]]; then
     	echo "+++++++++++ ROLE: $ROLE +++++++++++"
         #### go to $ROLE folder:
         cd $ROLE/
-	ROOT_PATH="../$ROOT_PATH"
+		ROOT_PATH="../$ROOT_PATH"
         echo "#### pwd: $(pwd)"
         echo "#### root_path: $ROOT_PATH"
         echo $CONSOLE_BR
         
+		#############################
+		# Configure host network 
+		#############################
+		# Network config file is stored in Global folder: /00_Global/
+		
+		pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
+		
     
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #++++++++++ RUN NODE 
@@ -360,11 +394,8 @@ if [[ $ROLE ]]; then
            
 	    # VARS for NODE are stored in "Node" file include in each node folder for each role 
 	    getVars $NODE"/Node" "NODE_NAME"
-            echo $CONSOLE_BR
+        echo $CONSOLE_BR
 	   
-	    echo "---"
-	   echo $ROSRUN_EXE 
-	    echo "---"
 	    # test folder is patern validated:
     	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
     		# yes folder name follows patern
