@@ -4,8 +4,8 @@
 # Define vars
 ########################################################################
 
-. ./Local
-. ./Global
+#. ./Local
+#. ./Global
 
 echo "ROS_MASTER_URI = $ROS_MASTER_URI"
 export ROS_MASTER_URI="$ROS_MASTER_URI"
@@ -19,8 +19,10 @@ case "$NODE_ROLE" in
             ########################################################################
             
             echo ">>>> Starting ROSCORE"
+            echo $CONSOLE_BR 
             roscore 
             echo "#### ROSCORE finished"
+            echo $CONSOLE_BR 
 
             ;;
         *)
@@ -30,6 +32,7 @@ case "$NODE_ROLE" in
             ########################################################################
             
             echo ">>>> Starting $NODE_NAME with $ROSRUN_EXE command"
+            echo $CONSOLE_BR 
             
             cd catkin_ws/src/
             echo "~~~~ go to $(pwd)"
@@ -38,8 +41,9 @@ case "$NODE_ROLE" in
             rosrun $NODE_NAME $ROSRUN_EXE
             
             echo "#### $NODE_NAME finished"
+            echo $CONSOLE_BR 
              
             exit 1
 esac
     
-echo $CONSOLE_HL 
+echo $CONSOLE_BR 

@@ -4,8 +4,8 @@
 # Define vars
 ########################################################################
 
-. ./Local
-. ./Global
+#. ./Local
+#. ./Global
 
 
 ########################################################################
@@ -13,17 +13,20 @@
 ########################################################################
 
 echo ">>>> Starting Docker $NODE_NAME with $DOCKER_CMD cmd"
+echo $CONSOLE_BR 
 #echo ">>>> Starting Docker $NODE_NAME"
 echo "#### REPO_NAME=$REPO_NAME"
 echo "#### NODE_NAME=$NODE_NAME"
 echo "#### NODE_VERSION=$NODE_VERSION"
 echo "#### DOCKER_RUN=$DOCKER_RUN"
 echo "#### NET_NAME=$NET_NAME"
-echo "#### NODE_IP=$NODE_IP"
+echo "#### ROLE_IP=$ROLE_IP"
 echo "#### DOCKER_CMD=$DOCKER_CMD"
+echo $CONSOLE_BR 
 
 
-echo "sudo docker run $DOCKER_RUN --net $NET_NAME --ip $NODE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION $DOCKER_CMD"
+echo "sudo docker run $DOCKER_RUN --net $NET_NAME --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION $DOCKER_CMD"
+echo $CONSOLE_BR 
 
 
 sudo docker run \
@@ -36,6 +39,6 @@ sudo docker run \
  $DOCKER_CMD
 
 echo "#### Docker run finished"
-echo $CONSOLE_HL 
+echo $CONSOLE_BR 
 
 

@@ -1,1 +1,1 @@
-./../../00_Global/2g_proceed.sh
+../.././00_Global/2g_proceed.sh

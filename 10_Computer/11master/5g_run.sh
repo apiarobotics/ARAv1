@@ -1,1 +1,1 @@
-./../../00_Global/5g_run.sh
+../.././00_Global/5g_run.sh

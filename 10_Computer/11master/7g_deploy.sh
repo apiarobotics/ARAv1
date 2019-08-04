@@ -4,8 +4,8 @@
 # Define vars
 ########################################################################
 
-. ./Local
-. ./Global
+#. ./Local
+#. ./Global
 
 
 ########################################################################
@@ -17,8 +17,10 @@
 if [ "$CATKIN" ==  "Yes" ]; then
     
     echo ":::: Deploy application with Catkin"
+        echo $CONSOLE_BR
     
     echo ">>>> Starting $NODE_NAME deploy process"
+        echo $CONSOLE_BR
     
     echo "~~~~ source ROS opt/ros/melodic/setup.bash"
     source /opt/ros/melodic/setup.bash
@@ -48,7 +50,7 @@ if [ "$CATKIN" ==  "Yes" ]; then
         chmod +x ./*
         echo "~~~~ show files in dir: $(pwd)"
         ls -la ./ 
-        echo "____________________________________________"
+        echo $CONSOLE_BR
         
         cd ../../../
         echo "~~~~ go to $(pwd)"
@@ -62,7 +64,8 @@ if [ "$CATKIN" ==  "Yes" ]; then
 else
     echo "#### No catkin pack to deploy"
 fi        
+echo $CONSOLE_BR
 
 echo "#### Application $NODE_NAME deploy processing finished"
-echo $CONSOLE_HL
+echo $CONSOLE_BR
 

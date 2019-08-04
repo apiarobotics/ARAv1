@@ -1,1 +1,1 @@
-./../../00_Global/3g_build.sh
+../.././00_Global/3g_build.sh

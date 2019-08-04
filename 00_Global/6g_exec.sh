@@ -4,8 +4,9 @@
 # Define vars
 ########################################################################
 
-. ./Local
 . ./Global
+. ./Role
+. ./Node
 
 
 ########################################################################
@@ -16,7 +17,8 @@ echo ":::: Deployement processing (7 -> 9)"
 
 for i in [7-9][gd]* ; do
     DEFAULT="N"
-    read -e -p "Execute: $i ? [N/y/q]:" PROCEED
+    echo $CONSOLE_HL
+    read -e -p ":::: Execute: $i ? [N/y/q]:" PROCEED
     PROCEED="${PROCEED:-${DEFAULT}}"
     if [ "${PROCEED}" == "y" ] ; then
         echo ">>>> Step $i: Executing"
@@ -25,6 +27,6 @@ for i in [7-9][gd]* ; do
     else
         echo "#### Execution $i aborded !"
     fi
-    echo $CONSOLE_HL
+    echo $CONSOLE_BR
 done
 

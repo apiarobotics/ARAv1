@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#### #### #### #### #### #### #### ####
+# IMPORTANT: Nothing has to be setup here, except 2 vars if software binaries structure has changed
+ROOT_PATH="./"
+GLOBAL_PATH="00_Global/"
+#### #### #### #### #### #### #### ####
+
 clear
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,22 +36,29 @@ clear
 getVars (){
     # 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
     
-    VARS=$1
+    VARS_PATH=$1
     PATTERN=$2 
     
-    echo "**** Get Variables from $(pwd)/$VARS"
+    echo "**** Get Variables from $(pwd) / $VARS_PATH ($PATTERN)"
     echo $CONSOLE_BR
-    
-    if grep -q $PATTERN $VARS; then
 
+    if grep -q $PATTERN $VARS_PATH; then
         # path:
-        source $VARS
-
-        # read file 
-        echo "#### Param values from $VARS are: "
+        /bin/bash $VARS_PATH
+        
+	# read file 
+        echo "#### Param values from $VARS_PATH are: "
         while IFS='' read -r line || [[ -n "$line" ]]; do
             echo "#### $line"
-        done < "$VARS"
+	    VAR_NAME="${line%%=*}"
+	    temp="${line%=}"
+	    temp2="${temp##*=}"
+	    temp3="${temp2%\"}"
+            temp4="${temp3#\"}"
+	    VAR_DATA=$temp4
+	    export $VAR_NAME="$VAR_DATA"
+	    #echo $VAR_NAME"="$VAR_DATA
+        done < "$VARS_PATH"
 
     else
         echo "!!!!!!!!!! $VARS file not found, install aborded !"
@@ -231,9 +244,7 @@ echo $CONSOLE_BR
 # Define GLOBAL vars 
 #############################
 
-GPATH="./00_Global/Global"
-GLOBAL_PATH=$GPATH
-getVars $GLOBAL_PATH "APP_NAME"
+getVars $ROOT_PATH""$GLOBAL_PATH"Global" "APP_NAME"
 echo $CONSOLE_BR 
 
 
@@ -309,9 +320,8 @@ if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
 	n=$(($PROCEED-1))
 	#echo "n = $n"
 	ROLE=${ROLES[$n]}
-
 	
-	getVars "$ROLE/Role" "ROLE_NAME"
+	getVars $ROOT_PATH""$ROLE"/Role" "ROLE_NAME"
 	echo $CONSOLE_BR 
 fi
 
@@ -326,11 +336,11 @@ if [[ $ROLE ]]; then
 	echo ">>>> Starting installer program"
         echo $CONSOLE_BR
     	echo "+++++++++++ ROLE: $ROLE +++++++++++"
-        #### go to "role" folder:
+        #### go to $ROLE folder:
         cd $ROLE/
-	GLOBAL_PATH="../$GPATH"
+	ROOT_PATH="../$ROOT_PATH"
         echo "#### pwd: $(pwd)"
-        echo "#### gbl_path: $GLOBAL_PATH"
+        echo "#### root_path: $ROOT_PATH"
         echo $CONSOLE_BR
         
     
@@ -346,10 +356,14 @@ if [[ $ROLE ]]; then
             #############################
             # Define NODE vars 
             #############################
-            
-	    getVars "$NODE/Node" "NODE_NAME"
+           
+	    # VARS for NODE are stored in "Node" file include in each node folder for each role 
+	    getVars $NODE"/Node" "NODE_NAME"
             echo $CONSOLE_BR
-	    
+	   
+	    echo "---"
+	   echo $ROSRUN_EXE 
+	    echo "---"
 	    # test folder is patern validated:
     	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
     		# yes folder name follows patern
@@ -361,9 +375,9 @@ if [[ $ROLE ]]; then
             	    echo ">>>> Node $NODE: Installing"
                     echo $CONSOLE_BR
 		    cd $NODE/
-	            GLOBAL_PATH="../../$GPATH"
+	            ROOT_PATH="../$ROOT_PATH"
                     echo "#### pwd: $(pwd)"
-                    echo "#### gbl_path: $GLOBAL_PATH"
+                    echo "#### root_path: $ROOT_PATH"
                     echo $CONSOLE_BR
                     echo " - - ROSRUN_EXE=$ROSRUN_EXE"
                     echo $CONSOLE_BR
@@ -380,7 +394,8 @@ if [[ $ROLE ]]; then
                        echo ">>>> Run 1g_update.sh" 
                        echo $CONSOLE_BR 
 
-		       /bin/bash $("$GLOBAL_PATH/1g_update.sh")
+		       source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
+
                        echo "#### 0_install.sh execution finished" 
                     else
                        echo "#### 1g_update program running aborded !"
