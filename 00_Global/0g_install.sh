@@ -126,10 +126,15 @@ checkPrereq (){
         curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
         sudo usermod -aG docker $(whoami)
         echo "#### $(docker -v) installed: OK"
+		rm -rf ./get-docker.sh
     fi
     echo $CONSOLE_BR 
-    
-    
+
+}
+
+
+swarmInstall (){
+
     #############################
     # Swarm INIT (master) or JOIN (nodes) 
     #############################
@@ -138,6 +143,7 @@ checkPrereq (){
     echo $CONSOLE_BR 
     
     #### Swarm mode cluster role selection
+	
     
     DEFAULT="N"
     #read -e -p ":::: INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
@@ -146,50 +152,64 @@ checkPrereq (){
     PROCEED="${PROCEED:-${DEFAULT}}"
     
     if [ "${PROCEED}" == "y" ] ; then 
-        echo $CONSOLE_HL 
-        read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
-        SWARM_TOKEN=$PROCEED
-        #### test token patern
-        # ---------
-        # ---------
-        # ---------
-        # ---------
-        # ---------
-        # ---------
-    
-        #### try to join swarm cluster:    
-        echo ">>>> Swarm: JOIN Swarm with token '$SWARM_TOKEN'"
-        echo $CONSOLE_BR
-        docker swarm join --token $SWARM_TOKEN \
-        --advertise-addr $SWARM_WORKER_IP \
-        $SWARM_MANAGER_IP:2237
-    
-        #### if doesn't work:
-        # ---------
+	
+		echo "ROLE = "$ROLE
+		
+		if $ROLE = "master"; then
+			
+			#### init new ? 
+			# ---------
+			DEFAULT="N"
+			echo $CONSOLE_HL 
+			read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
+			PROCEED="${PROCEED:-${DEFAULT}}"
+			
+			#### run swarm init 
+			# ---------
+			if [ "${PROCEED}" == "y" ] ; then 
+				echo ">>>> Swarm: INIT (master)"
+				echo $CONSOLE_BR
+				docker swarm init --advertise-addr=$SWARM_MANAGER_IP
+			else
+				echo "#### Swarm execution aborded !"
+			fi
+		
+			#### worked ? 
+			# ---------
+		
+		else
+		
+			echo $CONSOLE_HL 
+			read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
+			SWARM_TOKEN=$PROCEED
+			#### test token patern
+			# ---------
+			# ---------
+			# ---------
+			# ---------
+			# ---------
+			# ---------
+		
+			#### try to join swarm cluster:    
+			echo ">>>> Swarm: JOIN Swarm with token '$SWARM_TOKEN'"
+			echo $CONSOLE_BR
+			docker swarm join --token $SWARM_TOKEN \
+			--advertise-addr $SWARM_WORKER_IP \
+			$SWARM_MANAGER_IP:2237
+		
+			#### if doesn't work:
+			# ---------
+			
+		fi
+		
     else
-        #### init new ? 
-        # ---------
-        DEFAULT="N"
-        echo $CONSOLE_HL 
-        read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
-        PROCEED="${PROCEED:-${DEFAULT}}"
-        
-        #### run swarm init 
-        # ---------
-        if [ "${PROCEED}" == "y" ] ; then 
-            echo ">>>> Swarm: INIT (master)"
-            echo $CONSOLE_BR
-            docker swarm init --advertise-addr=$SWARM_MANAGER_IP
-        fi
-    
-        #### worked ? 
-        # ---------
-    
-    
         echo "#### Swarm execution aborded !"
     fi
     echo $CONSOLE_BR 
-    
+}
+
+
+vnetworkInstall () {
     
     #############################
     # Create overlay network and check network name already exists 
@@ -246,6 +266,7 @@ checkPrereq (){
     fi
     
     echo $CONSOLE_BR 
+
 
 }
 
