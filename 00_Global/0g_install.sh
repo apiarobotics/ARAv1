@@ -380,7 +380,7 @@ if [[ $ROLE ]]; then
                        echo ">>>> Run 1g_update.sh" 
                        echo $CONSOLE_BR 
 
-                       /bin/bash "$GLOBAL_PATH/1g_update.sh"
+		       /bin/bash $("$GLOBAL_PATH/1g_update.sh")
                        echo "#### 0_install.sh execution finished" 
                     else
                        echo "#### 1g_update program running aborded !"
