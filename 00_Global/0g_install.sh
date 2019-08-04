@@ -39,24 +39,28 @@ pushNetwork (){
 	ROLE=$1
 	NET_PATH=$2
 	
+	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
+	
 	sudo chmod 777 /etc/hosts
 	sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
 	
 	echo "#### Network values from $NET_PATH are: "
         while IFS='' read -r line || [[ -n "$line" ]]; do
             echo "#### $line"
-			VAR_NAME="${line%%=*}"
+			VAR_IP="${line%%=*}"
 			temp="${line%=}"
 			temp2="${temp##*=}"
 			temp3="${temp2%\"}"
 			temp4="${temp3#\"}"
-			VAR_DATA=$temp4
-			export $VAR_NAME="$VAR_DATA"
-			#echo $VAR_NAME"="$VAR_DATA
+			VAR_HOST=$temp4
+			export $VAR_IP="$VAR_HOST"
+			#echo $VAR_IP"="$VAR_HOST
 			
-			sudo echo "$VAR_NAME $VAR_DATA" >> /etc/hosts
+			sudo echo "$VAR_NAME $VAR_HOST" >> /etc/hosts
+			
+			sudo ssh-copy-id -i ~/.ssh/master.pub ubuntu@$VAR_IP
 					
-        done < "$VARS_PATH"
+        done < "$NET_PATH"
 	
 	sudo chmod 644 /etc/hosts
 }
