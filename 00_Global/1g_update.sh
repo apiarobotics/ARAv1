@@ -4,17 +4,17 @@
 # Define vars and create local copy of Global file
 ########################################################################
 
-. ./Local
-echo "~~~~ source Local file to get $GLOBAL_PATH"
-
-echo "~~~~ if local file Global already exists then delete it"
-if [ -f Global ]; then
-    rm -rf Global
-fi
-
-echo "~~~~ copy Global file from $GLOBAL_PATH to local folder"
-cp ./$GLOBAL_PATH/Global ./
-. ./Global
+#. ./Local
+#echo "~~~~ source Local file to get $GLOBAL_PATH"
+#
+#echo "~~~~ if local file Global already exists then delete it"
+#if [ -f Global ]; then
+#    rm -rf Global
+#fi
+#
+#echo "~~~~ copy Global file from $GLOBAL_PATH to local folder"
+#cp ./$GLOBAL_PATH/Global ./
+#. ./Global
 
 
 ########################################################################
@@ -34,6 +34,16 @@ echo ">>>> Starting removing and copying Global file"
 rm -rf Global
 cp $GLOBAL_PATH/Global ./
 echo "#### Global file copied (from $GLOBAL_PATH to $(pwd))"
+echo $CONSOLE_HL
+
+########################################################################
+# Remove and copy Role file to able to use role variables inside container
+########################################################################
+
+echo ">>>> Starting removing and copying Role file"
+rm -rf Role
+cp ../Role ./
+echo "#### Role file copied (from $ROLE to $(pwd))"
 echo $CONSOLE_HL
 
 

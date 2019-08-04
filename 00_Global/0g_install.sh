@@ -1,156 +1,411 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 clear
 
-########################################################################
-# Define vars 
-########################################################################
-#source Local (local param file) and get $GLOBAL_PATH
-. ./Local
-
-#use $GLOBAL_PATH to source Global (global param file)
-. ./$GLOBAL_PATH/Global
-
-
-########################################################################
-# Intro message
-########################################################################
-
-echo " *************************************************** "
-echo " ***  Welcome to $APP_NAME:$APP_VERSION/$NODE_NAME:$NODE_VERSION installation program  *** "
-echo " *************************************************** "
-echo "#### please refer to apiarobotics.com to get informed for $APP_NAME updates or new services"
-
-echo "#### Param values from Local are: "
-echo " - - GLOBAL_PATH=$GLOBAL_PATH"
-echo " - - NODE_NAME=$NODE_NAME"
-echo " - - NODE_ROLE=$NODE_ROLE"
-echo " - - NODE_VERSION=$NODE_VERSION"
-echo " - - NODE_IP=$NODE_IP"
-echo " - - SWARM_WORKER_IP=$SWARM_WORKER_IP"
-echo " - - DOCKER_RUN=$DOCKER_RUN"
-echo " - - DOCKER_CMD=$DOCKER_CMD"
-echo " - - CATKIN=$CATKIN"
-echo " - - ROSRUN_EXE=$ROSRUN_EXE"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~ 
+#~~~~ 
+#~~~~ Autor: Adrien Beaudrey
+#~~~~ 
+#~~~~ Version: 0.1
+#~~~~ 
+#~~~~ Date: 2019.08.03
+#~~~~ 
+#~~~~ Title: Install 
+#~~~~ 
+#~~~~ Purpose: Deploy a specific "role" of software for ARA (Apiary Robotic Assistant)
+#~~~~ 
+#~~~~ Site: https://apiarobotics.com
+#~~~~ 
+#~~~~ 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-echo "#### Param values from Global are: "
-echo " - - APP_NAME=$APP_NAME"
-echo " - - APP_VERSION=$APP_VERSION"
-echo " - - REPO_NAME=$REPO_NAME"
-echo " - - NET_NAME=$NET_NAME"
-echo " - - APP_SUBNET=$APP_SUBNET"
-echo " - - ROS_MASTER_URI=$ROS_MASTER_URI"
-echo " - - SWARM_MANAGER_IP=$SWARM_MANAGER_IP"
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++ PROGRAM FUNCTIONS 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-echo $CONSOLE_HL 
-echo $(pwd)
-echo $(whoami)
-echo ""
+getVars (){
+    # 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
+    
+    VARS=$1
+    PATTERN=$2 
+    
+    echo "**** Get Variables from $(pwd)/$VARS"
+    echo $CONSOLE_BR
+    
+    if grep -q $PATTERN $VARS; then
 
-########################################################################
-# Check Docker installation and install Docker if needed
-########################################################################
+        # path:
+        source $VARS
 
-echo ":::: Checking prerequisites: Docker"
+        # read file 
+        echo "#### Param values from $VARS are: "
+        while IFS='' read -r line || [[ -n "$line" ]]; do
+            echo "#### $line"
+        done < "$VARS"
 
-dpkg -l | grep docker-engine >/dev/null
-#command -v docker >/dev/null
-if [ $? -eq 0 ] ; then
-    echo "#### $(docker -v) is already installed: OK"
-else
-    echo ">>>> Installating Docker"
-    sudo apt install curl
-    curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-    sudo usermod -aG docker $(whoami)
-    echo "#### $(docker -v) installed: OK"
-fi
-echo $CONSOLE_HL 
-
-
-########################################################################
-# Swarm INIT (master) or JOIN (nodes) 
-########################################################################
-
-echo ":::: Swarm: INIT or JOIN"
-
-DEFAULT="N"
-read -e -p "INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
-PROCEED="${PROCEED:-${DEFAULT}}"
-if [ "${PROCEED}" == "y" ] ; then 
-    if [ $NODE_ROLE == "master" ]; then
-        echo ":::: Swarm: INIT (master)"
-        docker swarm init --advertise-addr=$SWARM_MANAGER_IP
     else
-        echo ":::: Swarm: INIT (master)"
+        echo "!!!!!!!!!! $VARS file not found, install aborded !"
+
+    fi
+    
+}
+
+checkPrereq (){
+# run all prerequistes on start: docker, docker-swarm, docker-network
+
+
+    #############################
+    # Check Docker installation and install Docker if needed
+    #############################
+    
+    echo "**** Checking prerequisites: Docker"
+    echo $CONSOLE_BR
+    
+    #echo "dpkg command: $(dpkg -l | grep docker-ce)"
+    #echo $(dpkg -l | grep docker-ce >/dev/null)
+    #echo $(dpkg -l | grep docker-ce >/dev/null)
+    #command -v docker >/dev/null
+    
+    #if [ $? -eq 0 ] ; then
+    #    echo "#### $(docker -v) is already installed: OK"
+    if DOCKER_VERSION=$(sudo docker -v); then
+        echo "#### $DOCKER_VERSION is already installed: OK"
+    else
+        echo ">>>> Installing Docker"
+        echo $CONSOLE_BR
+        sudo apt install curl
+        curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+        sudo usermod -aG docker $(whoami)
+        echo "#### $(docker -v) installed: OK"
+    fi
+    echo $CONSOLE_BR 
+    
+    
+    #############################
+    # Swarm INIT (master) or JOIN (nodes) 
+    #############################
+    
+    echo "**** Swarm: INIT or JOIN"
+    echo $CONSOLE_BR 
+    
+    #### Swarm mode cluster role selection
+    
+    DEFAULT="N"
+    #read -e -p ":::: INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
+    echo $CONSOLE_HL 
+    read -e -p ":::: Do you want to JOIN an existing swarm cluster ? [N/y/q] ": PROCEED
+    PROCEED="${PROCEED:-${DEFAULT}}"
+    
+    if [ "${PROCEED}" == "y" ] ; then 
+        echo $CONSOLE_HL 
+        read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
+        SWARM_TOKEN=$PROCEED
+        #### test token patern
+        # ---------
+        # ---------
+        # ---------
+        # ---------
+        # ---------
+        # ---------
+    
+        #### try to join swarm cluster:    
+        echo ">>>> Swarm: JOIN Swarm with token '$SWARM_TOKEN'"
+        echo $CONSOLE_BR
         docker swarm join --token $SWARM_TOKEN \
         --advertise-addr $SWARM_WORKER_IP \
         $SWARM_MANAGER_IP:2237
-    fi
-else
-    echo "#### Swarm INIT or JOIN execution aborded !"
-fi
-echo $CONSOLE_HL 
-
-
-########################################################################
-# Create overlay network and check network name already exists 
-########################################################################
-
-DEFAULT="N"
-read -e -p ":::: Create overlay network ? [N/y/q] ": PROCEED
-PROCEED="${PROCEED:-${DEFAULT}}"
-if [ "${PROCEED}" == "y" ] ; then 
-    NET_ACT="create"
-
-    NET_CHECK=$(docker network inspect $NET_NAME --format {{.Name}})
-
-    #### check if network with same name already exixts
-    if [ $NET_CHECK == $NET_NAME ]; then
+    
+        #### if doesn't work:
+        # ---------
+    else
+        #### init new ? 
+        # ---------
         DEFAULT="N"
-
-        #### ask user what to do: delete and create or abort ? 
-        read -e -p ":::: Network $NET_NAME already exists, delete and recreate (y) or abort this step (N) ?": PROCEED
+        echo $CONSOLE_HL 
+        read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
         PROCEED="${PROCEED:-${DEFAULT}}"
-
-        #### if user wants to remove network then create it
+        
+        #### run swarm init 
+        # ---------
         if [ "${PROCEED}" == "y" ] ; then 
-            echo ">>>> Docker: Removing network named '$NET_NAME'"
-            echo "#### Docker network: $(docker network rm $NET_NAME) removed !" 
-            NET_ACT="create"
-        #### else user wants to abort process
-        else
-            NET_ACT="abort"
-            echo "#### Network creation aborded !"
+            echo ">>>> Swarm: INIT (master)"
+            echo $CONSOLE_BR
+            docker swarm init --advertise-addr=$SWARM_MANAGER_IP
         fi
-   fi 
+    
+        #### worked ? 
+        # ---------
+    
+    
+        echo "#### Swarm execution aborded !"
+    fi
+    echo $CONSOLE_BR 
+    
+    
+    #############################
+    # Create overlay network and check network name already exists 
+    #############################
+    
+    DEFAULT="N"
+    echo $CONSOLE_HL 
+    read -e -p ":::: Create overlay network ? [N/y/q] ": PROCEED
+    PROCEED="${PROCEED:-${DEFAULT}}"
+    if [ "${PROCEED}" == "y" ] ; then 
+        NET_ACT="create"
+    
+        NET_CHECK=$(docker network inspect $NET_NAME --format {{.Name}})
+    
+        #### check if network with same name already exixts
+        if [ $NET_CHECK == $NET_NAME ]; then
+            DEFAULT="N"
+    
+            #### ask user what to do: delete and create or abort ? 
+            echo $CONSOLE_HL 
+            read -e -p ":::: Network $NET_NAME already exists, delete and recreate (y) or abort this step (N) ?": PROCEED
+            PROCEED="${PROCEED:-${DEFAULT}}"
+    
+            #### if user wants to remove network then create it
+            if [ "${PROCEED}" == "y" ] ; then 
+                echo ">>>> Docker: Removing network named '$NET_NAME'"
+                echo $CONSOLE_BR
+                echo "#### Docker network: $(docker network rm $NET_NAME) removed !" 
+                echo $CONSOLE_BR
+                NET_ACT="create"
+            #### else user wants to abort process
+            else
+                NET_ACT="abort"
+                echo "#### Network creation aborded !"
+                echo $CONSOLE_BR
+            fi
+       fi 
+    
+       #### if request is create the network
+       if [ $NET_ACT == "create" ]; then
+           echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
+           echo $CONSOLE_BR
+           
+	   if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
+               echo "#### Docker network: $?"
+           else
+               echo "!!!! Network not working !"
+           fi
+           echo $CONSOLE_BR
+       fi
+    
+    else
+        echo "#### Network creation aborded !"
+    fi
+    
+    echo $CONSOLE_BR 
 
-   #### if request is create the network
-   if [ $NET_ACT == "create" ]; then
-       echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
-       echo "#### Docker network: $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME)"
-   fi
-
-else
-    echo "#### Network creation aborded !"
-fi
-
-echo $CONSOLE_HL 
+}
 
 
-########################################################################
-# Run 1g_update to create simlinks and copy files to local for first time 
-########################################################################
 
-DEFAULT="y"
-read -e -p "Run 1g_update program to update files on local ? [N/y/q] ": PROCEED
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++ RUN GLOBAL 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+#############################
+# Intro message
+#############################
+
+echo " *************************************************** "
+echo " ***  Welcome to $APP_NAME:$APP_VERSION installation program  *** "
+echo " *************************************************** "
+echo "#### please refer to apiarobotics.com to get informed for $APP_NAME updates or new services"
+echo $CONSOLE_BR
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++ CHECK PREREQUISITES
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#############################
+# Define GLOBAL vars 
+#############################
+
+GPATH="./00_Global/Global"
+GLOBAL_PATH=$GPATH
+getVars $GLOBAL_PATH "APP_NAME"
+echo $CONSOLE_BR 
+
+
+#############################
+# Run checkPrereq function 
+#############################
+
+checkPrereq
+echo $CONSOLE_BR
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++ SELECT ROLE
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#############################
+# List technical roles
+#############################
+#[1] : Master (Master=roscore Logics, Database) 
+#[2] : Robot manager (Physics, Robot) 
+#[3] : Capture manager 
+#[4] : Bodies manager  
+#[5] : Frames manager  
+#[6] : Store manager  
+
+#### process: scan current directory for ARA software architecture detection and list all role availables in version package && local config settings.
+echo ">>>> Starting scan of roles available to deploy"
+echo $CONSOLE_BR
+
+#### scan and construct array to "store" list of role folders.
+i=0 #index to array key
+declare -a ROLES
+for role in [1-9]*; do
+	#echo "i = $i , role = $role"
+	ROLES[$i]=$role
+	((i++))
+done
+
+#### once array built print to console
+ROLE_NB=${#ROLES[*]}
+echo "#### Scan finished, $ROLE_NB roles availables:"
+echo $CONSOLE_BR
+
+#### list entries in array "ROLES" and show them to console
+j=1 #index
+list='' #var to store list of indexes (to remind user available choices)
+for role in ${ROLES[*]}; do
+	echo "#### [$j] = $role"
+#	echo $role 
+#	echo ${ROLES[$m]}
+	list=$list"[$j] "
+	((j++))
+done
+echo $CONSOLE_BR
+
+#### show request form to select role to deploy (-> start install file hosted in each "role" folder) 
+DEFAULT="q"
+echo $CONSOLE_HL
+read -e -p ":::: Choose role to deploy ($list) or [q] to quit": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
-if [ "${PROCEED}" == "y" ] ; then 
-   echo ">>>> Run 1g_update.sh" 
-   /bin/bash $GLOBAL_PATH/1g_update.sh
-   echo "#### 0_install.sh execution finished" 
-else
-   echo "#### 1g_update program running aborded !"
-fi
-echo $CONSOLE_HL 
 
+    
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++ RUN ROLE 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#############################
+# Define ROLE vars 
+#############################
+
+#### define vars ROLE for next steps
+if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
+	n=$(($PROCEED-1))
+	#echo "n = $n"
+	ROLE=${ROLES[$n]}
+
+	
+	getVars "$ROLE/Role" "ROLE_NAME"
+	echo $CONSOLE_BR 
+fi
+
+
+#############################
+# Deploy role 
+#############################
+
+#### go to "role" folder and run "build" script
+if [[ $ROLE ]]; then
+
+	echo ">>>> Starting installer program"
+        echo $CONSOLE_BR
+    	echo "+++++++++++ ROLE: $ROLE +++++++++++"
+        #### go to "role" folder:
+        cd $ROLE/
+	GLOBAL_PATH="../$GPATH"
+        echo "#### pwd: $(pwd)"
+        echo "#### gbl_path: $GLOBAL_PATH"
+        echo $CONSOLE_BR
+        
+    
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #++++++++++ RUN NODE 
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        #### for each folder (node) inside role root folder: 
+        for NODE in [1-9]*; do
+    	    echo "+++++++++++ NODE: $NODE +++++++++++"
+            echo $CONSOLE_BR
+	
+            #############################
+            # Define NODE vars 
+            #############################
+            
+	    getVars "$NODE/Node" "NODE_NAME"
+            echo $CONSOLE_BR
+	    
+	    # test folder is patern validated:
+    	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
+    		# yes folder name follows patern
+    		DEFAULT="N"
+                echo $CONSOLE_HL
+    		read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
+    		PROCEED="${PROCEED:-${DEFAULT}}"
+    		if [ "${PROCEED}" == "y" ] ; then
+            	    echo ">>>> Node $NODE: Installing"
+                    echo $CONSOLE_BR
+		    cd $NODE/
+	            GLOBAL_PATH="../../$GPATH"
+                    echo "#### pwd: $(pwd)"
+                    echo "#### gbl_path: $GLOBAL_PATH"
+                    echo $CONSOLE_BR
+                    echo " - - ROSRUN_EXE=$ROSRUN_EXE"
+                    echo $CONSOLE_BR
+                    
+	            #############################
+                    # Run 1g_update to create simlinks and copy files to local for first time 
+                    #############################
+                    
+                    DEFAULT="y"
+                    echo $CONSOLE_HL
+		    read -e -p ":::: Run 1g_update program to update files in node directory ($NODE)  ? [N/y/q] ": PROCEED
+                    PROCEED="${PROCEED:-${DEFAULT}}"
+                    if [ "${PROCEED}" == "y" ] ; then 
+                       echo ">>>> Run 1g_update.sh" 
+                       echo $CONSOLE_BR 
+
+                       /bin/bash "$GLOBAL_PATH/1g_update.sh"
+                       echo "#### 0_install.sh execution finished" 
+                    else
+                       echo "#### 1g_update program running aborded !"
+                    fi
+                    echo $CONSOLE_BR 
+
+
+	            #############################
+                    # Run  
+                    #############################
+
+
+        		echo "#### Node $i: Installation done"
+    		else
+        		echo "#### Installation $i aborded !"
+    		fi
+                echo $CONSOLE_BR 
+    	    #fi
+    done
+    
+
+else
+        echo "#### invalid entry, please relaunch program after terminating"
+        echo $CONSOLE_BR
+fi
+
+echo "#### installation aborded !"
+echo $CONSOLE_BR
