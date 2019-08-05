@@ -41,7 +41,7 @@ pushNetwork (){
 	
 	#test network
 	
-	if $(hostname) 
+	#if $(hostname)
 	
 	#test cert
 	
