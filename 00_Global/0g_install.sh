@@ -55,7 +55,7 @@ pushNetwork (){
 	v=0
 	echo "#### Network values from $NET_PATH are: "
 	while IFS='' read -r line || [[ -n "$line" ]]; do
-		if $v != 0; then
+		if [ $v != 0 ]; then
 		
 			#if line in file starts by ???; then
 			echo "#### $line"
@@ -73,7 +73,8 @@ pushNetwork (){
 			if $ROLE = $MASTER_ROLE; then
 				#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
 			fi
-		fi		
+
+		fi
 		
 	done < "$NET_PATH"
 	
