@@ -45,7 +45,9 @@ pushNetwork (){
 	
 	#test cert
 	
-	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
+	if $ROLE = $MASTER_ROLE; then
+		sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
+	fi
 	
 	sudo chmod 777 /etc/hosts
 	sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
@@ -68,7 +70,9 @@ pushNetwork (){
 			
 			sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
 			
-			#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+			if $ROLE = $MASTER_ROLE; then
+				#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+			fi
 		fi		
 		
 	done < "$NET_PATH"
@@ -152,33 +156,34 @@ swarmInstall (){
     # Swarm INIT (master) or JOIN (nodes) 
     #############################
     
-    echo "**** Swarm: INIT or JOIN"
-    echo $CONSOLE_BR 
-    
-    #### Swarm mode cluster role selection
+    echo "**** Swarm: Deploy ?"
+    echo $CONSOLE_BR
 	
-    
-    DEFAULT="N"
-    #read -e -p ":::: INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
-    echo $CONSOLE_HL 
-    read -e -p ":::: Do you want to JOIN an existing swarm cluster ? [N/y/q] ": PROCEED
+	echo $CONSOLE_HL 
+    read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
     PROCEED="${PROCEED:-${DEFAULT}}"
     
     if [ "${PROCEED}" == "y" ] ; then 
-	
+    
+		#### Swarm mode cluster role selection
+		
 		echo "ROLE = "$ROLE
 		
-		if $ROLE = "master"; then
-			
-			#### init new ? 
-			# ---------
+		DEFAULT="N"
+		#read -e -p ":::: INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
+		
+		#if role = master > INIT else JOIN
+		if $ROLE = $MASTER_ROLE; then
+		
+			#### INIT confirmation ? 
+
 			DEFAULT="N"
 			echo $CONSOLE_HL 
 			read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
 			PROCEED="${PROCEED:-${DEFAULT}}"
 			
 			#### run swarm init 
-			# ---------
+
 			if [ "${PROCEED}" == "y" ] ; then 
 				echo ">>>> Swarm: INIT (master)"
 				echo $CONSOLE_BR
@@ -188,10 +193,9 @@ swarmInstall (){
 			fi
 		
 			#### worked ? 
-			# ---------
-		
+			
 		else
-		
+					
 			echo $CONSOLE_HL 
 			read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
 			SWARM_TOKEN=$PROCEED
@@ -216,8 +220,9 @@ swarmInstall (){
 		fi
 		
     else
-        echo "#### Swarm execution aborded !"
+        echo "#### Swarm deployment aborded !"
     fi
+	
     echo $CONSOLE_BR 
 }
 
