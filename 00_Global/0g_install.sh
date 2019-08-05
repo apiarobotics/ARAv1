@@ -46,7 +46,7 @@ pushNetwork (){
     #############################
     
     echo "**** Deploying: Network"
-	echo "####ROLE = "$ROLE
+	echo "#### ROLE = "$ROLE
 	echo "#### MASTER_ROLE = "$MASTER_ROLE
     echo $CONSOLE_BR
 	
@@ -101,15 +101,15 @@ getVars (){
     ############################# 
 	# 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
 	
-    echo "**** Get Variables from $(pwd) / $VARS_PATH (confirmation pattern = '$PATTERN')"
-    echo $CONSOLE_BR
+    echo "**** Get Variables from $(pwd) / $VARS_PATH (confirmation pattern = '$PATTERN') :"
+    #echo $CONSOLE_BR
 
     if grep -q $PATTERN $VARS_PATH; then
         # path:
         /bin/bash $VARS_PATH
         
 	# read file 
-        echo "#### Param values from $VARS_PATH are: "
+        #echo "#### Param values from $VARS_PATH are: "
         while IFS='' read -r line || [[ -n "$line" ]]; do
             echo "#### $line"
 			VAR_NAME="${line%%=*}"
@@ -162,13 +162,13 @@ swarmInstall (){
     #############################
     
     echo "**** Deploying: Swarm"
-	echo "ROLE = "$ROLE
+	echo "#### ROLE = "$ROLE
 	echo "#### MASTER_ROLE = "$MASTER_ROLE
     echo $CONSOLE_BR
 	
 	#### Swarm mode cluster role selection
 	DEFAULT="N"
-	if $ROLE = $MASTER_ROLE; then
+	if [ $ROLE = $MASTER_ROLE ]; then
 	
 		#### INIT confirmation ? 
 		DEFAULT="N"
@@ -180,7 +180,7 @@ swarmInstall (){
 		if [ "${PROCEED}" == "y" ] ; then 
 			echo ">>>> Swarm INIT"
 			echo $CONSOLE_BR
-			docker swarm init --advertise-addr=$SWARM_MANAGER_IP
+			echo "docker swarm init --advertise-addr=$SWARM_MANAGER_IP" ## delete echo to activate
 			
 			#### worked ? 
 			# ---------
@@ -207,9 +207,7 @@ swarmInstall (){
 		if [ "${PROCEED}" == "y" ] ; then 		
 			echo ">>>> Swarm JOIN with token '$SWARM_TOKEN'"
 			echo $CONSOLE_BR
-			docker swarm join --token $SWARM_TOKEN \
-			--advertise-addr $SWARM_WORKER_IP \
-			$SWARM_MANAGER_IP:2237
+			echo "sudo docker swarm join --token $SWARM_TOKEN --advertise-addr $SWARM_WORKER_IP $SWARM_MANAGER_IP:2237" # delete echo to activate
 			
 			#### worked ?		
 			
@@ -278,8 +276,15 @@ vnetworkInstall () {
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#++++++++++ RUN GLOBAL 
+#++++++++++ RUN GLOBAL (same for all roles)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#############################
+# Define GLOBAL vars 
+#############################
+
+getVars $ROOT_PATH""$GLOBAL_PATH"Global" "APP_NAME"
+echo $CONSOLE_BR 
 
 
 #############################
@@ -291,18 +296,6 @@ echo " ***  Welcome to $APP_NAME:$APP_VERSION installation program  *** "
 echo " *************************************************** "
 echo "#### please refer to apiarobotics.com to get informed for $APP_NAME updates or new services"
 echo $CONSOLE_BR
-
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#++++++++++ CHECK PREREQUISITES
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#############################
-# Define GLOBAL vars 
-#############################
-
-getVars $ROOT_PATH""$GLOBAL_PATH"Global" "APP_NAME"
-echo $CONSOLE_BR 
 
 
 #############################
@@ -320,9 +313,9 @@ echo $CONSOLE_BR
 #############################
 # List technical roles
 #############################
-#[1] : Master (Master=roscore Logics, Database) 
-#[2] : Robot manager (Physics, Robot) 
-#[3] : Capture manager 
+#[1] : Master (Roscore, Logics, Database) 
+#[2] : Robot manager (Physics, Structure) 
+#[3] : Capture manager (Environment)
 #[4] : Bodies manager  
 #[5] : Frames manager  
 #[6] : Store manager  
@@ -363,6 +356,7 @@ echo $CONSOLE_HL
 read -e -p ":::: Choose role to deploy ($list) or [q] to quit": PROCEED
 PROCEED="${PROCEED:-${DEFAULT}}"
 
+echo $CONSOLE_BR
     
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++ RUN ROLE 
@@ -377,6 +371,9 @@ if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
 	n=$(($PROCEED-1))
 	#echo "n = $n"
 	ROLE=${ROLES[$n]}
+
+	echo "#### your choice is : $ROLE #####"
+	echo $CONSOLE_BR 
 	
 	getVars $ROOT_PATH""$ROLE"/Role" "ROLE_NAME"
 	echo $CONSOLE_BR 
@@ -390,9 +387,7 @@ fi
 #### go to "role" folder and run "build" script
 if [[ $ROLE ]]; then
 
-	echo ">>>> Starting installer program"
-	echo $CONSOLE_BR
-	echo "+++++++++++ ROLE: $ROLE +++++++++++"
+	echo ">>>> Starting installer program for $ROLE"
 	echo $CONSOLE_BR
 	#### go to $ROLE folder:
 	cd $ROLE/
@@ -400,7 +395,8 @@ if [[ $ROLE ]]; then
 	echo "#### pwd: $(pwd)"
 	echo "#### root_path: $ROOT_PATH"
 	echo $CONSOLE_BR
-	
+
+
 	#############################
 	# Configure host network 
 	#############################
@@ -411,11 +407,9 @@ if [[ $ROLE ]]; then
 	read -e -p ":::: Proceed network setup ? [N/y/q]:" PROCEED
 	PROCEED="${PROCEED:-${DEFAULT}}"
 	if [ "${PROCEED}" == "y" ] ; then
-	
-		pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
-		
+	    pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
 	else
-		echo "#### Network setup aborded !"
+	    echo "#### Network setup aborded !"
 	fi
 	echo $CONSOLE_BR 
 	
@@ -425,101 +419,103 @@ if [[ $ROLE ]]; then
 	#############################	
 	
 	echo $CONSOLE_HL 
-    read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
-    PROCEED="${PROCEED:-${DEFAULT}}"
-    
-    if [ "${PROCEED}" == "y" ] ; then 
-		swarmInstall
+        read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
+        PROCEED="${PROCEED:-${DEFAULT}}"
+        if [ "${PROCEED}" == "y" ] ; then 
+	   swarmInstall
 	else
-        echo "#### Swarm deployment aborded !"
-    fi
-	
-    echo $CONSOLE_BR 
+           echo "#### Swarm deployment aborded !"
+        fi
+        echo $CONSOLE_BR 
 	
 	#############################
 	# Deploy virtual network (Docker) 
 	#############################	
 	
 	echo $CONSOLE_HL 
-    read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
-    PROCEED="${PROCEED:-${DEFAULT}}"
-    
-    if [ "${PROCEED}" == "y" ] ; then 
+        read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
+        PROCEED="${PROCEED:-${DEFAULT}}"
+        if [ "${PROCEED}" == "y" ] ; then 
 		vnetworkInstall
 	else
-        echo "#### Virtual network deployment aborded !"
-    fi
-	
-    echo $CONSOLE_BR 
+            echo "#### Virtual network deployment aborded !"
+        fi
+        echo $CONSOLE_BR 
+
 
 	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	#++++++++++ RUN NODE 
+	#++++++++++ SCAN NODES (for ROLE selected)
 	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	#### for each folder (node) inside role root folder: 
 	for NODE in [1-9]*; do
-		echo "+++++++++++ NODE: $NODE +++++++++++"
-		echo $CONSOLE_BR
+	    
+	    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	    #++++++++++ RUN NODE 
+	    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+      	    #echo "+++++++++++ NODE: $NODE +++++++++++"
+            #echo $CONSOLE_BR
 
-		#############################
-		# Define NODE vars 
-		#############################
+	    #############################
+	    # Define NODE vars 
+	    #############################
 	   
-	# VARS for NODE are stored in "Node" file include in each node folder for each role 
-	getVars $NODE"/Node" "NODE_NAME"
-	echo $CONSOLE_BR
+	    # VARS for NODE are stored in "Node" file include in each node folder for each role 
+	    getVars $NODE"/Node" "NODE_NAME"
+	    echo $CONSOLE_BR
    
-	# test folder is patern validated:
-		#if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
-		# yes folder name follows patern
-		DEFAULT="N"
-		echo $CONSOLE_HL
-		read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
-		PROCEED="${PROCEED:-${DEFAULT}}"
-		if [ "${PROCEED}" == "y" ] ; then
-				echo ">>>> Node $NODE: Installing"
-				echo $CONSOLE_BR
+	    # test folder is patern validated:
+	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
+	    # yes folder name follows patern
+	    DEFAULT="N"
+	    echo $CONSOLE_HL
+	    read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
+	    PROCEED="${PROCEED:-${DEFAULT}}"
+	    if [ "${PROCEED}" == "y" ] ; then
+		echo ">>>> Node $NODE: Installing"
+		echo $CONSOLE_BR
 		cd $NODE/
-			ROOT_PATH="../$ROOT_PATH"
-				echo "#### pwd: $(pwd)"
-				echo "#### root_path: $ROOT_PATH"
-				echo $CONSOLE_BR
-				echo " - - ROSRUN_EXE=$ROSRUN_EXE"
-				echo $CONSOLE_BR
+		ROOT_PATH="../$ROOT_PATH"
+		echo "#### pwd: $(pwd)"
+		echo "#### root_path: $ROOT_PATH"
+		echo $CONSOLE_BR
+		echo " - - ROSRUN_EXE=$ROSRUN_EXE"
+		echo $CONSOLE_BR
 				
-			#############################
-				# Run 1g_update to create simlinks and copy files to local for first time 
-				#############################
+		#############################
+		# Run 1g_update to create simlinks and copy files to local for first time 
+		#############################
 				
-				DEFAULT="y"
-				echo $CONSOLE_HL
+		DEFAULT="y"
+		echo $CONSOLE_HL
 		read -e -p ":::: Run 1g_update program to update files in node directory ($NODE)  ? [N/y/q] ": PROCEED
-				PROCEED="${PROCEED:-${DEFAULT}}"
-				if [ "${PROCEED}" == "y" ] ; then 
-				   echo ">>>> Run 1g_update.sh" 
-				   echo $CONSOLE_BR 
+		PROCEED="${PROCEED:-${DEFAULT}}"
+		if [ "${PROCEED}" == "y" ] ; then 
+		   echo ">>>> Run 1g_update.sh" 
+		   echo $CONSOLE_BR 
 
 		   source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
 
-				   echo "#### 0_install.sh execution finished" 
-				else
-				   echo "#### 1g_update program running aborded !"
-				fi
-				echo $CONSOLE_BR 
-
-
-			#############################
-				# Run  
-				#############################
-
-
-			echo "#### Node $i: Installation done"
-		else
-			echo "#### Installation $i aborded !"
+		   echo "#### 0_install.sh execution finished" 
+	        else
+		   echo "#### 1g_update program running aborded !"
 		fi
-			echo $CONSOLE_BR 
-		#fi
-    done
+		echo $CONSOLE_BR 
+
+
+		#############################
+		# Finishing program  
+		#############################
+
+
+		echo "#### Node $i: Installation done"
+	    else
+		echo "#### Installation $i aborded !"
+	    fi
+	    echo $CONSOLE_BR 
+	    #fi
+        done
 
 else
         echo "#### invalid entry, please relaunch program after terminating"
