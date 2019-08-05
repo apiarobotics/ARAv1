@@ -45,20 +45,20 @@ pushNetwork (){
 	sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
 	
 	echo "#### Network values from $NET_PATH are: "
-        while IFS='' read -r line || [[ -n "$line" ]]; do
-            echo "#### $line"
-			VAR_IP="${line%%=*}"
-			temp="${line%=}"
-			temp2="${temp##*=}"
-			temp3="${temp2%\"}"
-			temp4="${temp3#\"}"
-			VAR_HOST=$temp4
-			
-			sudo echo "$VAR_NAME $VAR_HOST" >> /etc/hosts
-			
-			#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
-					
-        done < "$NET_PATH"
+	while IFS='' read -r line || [[ -n "$line" ]]; do
+		echo "#### $line"
+		VAR_IP="${line%%=*}"
+		temp="${line%=}"
+		temp2="${temp##*=}"
+		temp3="${temp2%\"}"
+		temp4="${temp3#\"}"
+		VAR_HOST=$temp4
+		
+		sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
+		
+		#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+				
+	done < "$NET_PATH"
 	
 	cat /etc/hosts
 	sudo chmod 644 /etc/hosts
@@ -387,92 +387,91 @@ fi
 if [[ $ROLE ]]; then
 
 	echo ">>>> Starting installer program"
-        echo $CONSOLE_BR
-    	echo "+++++++++++ ROLE: $ROLE +++++++++++"
-        #### go to $ROLE folder:
-        cd $ROLE/
-		ROOT_PATH="../$ROOT_PATH"
-        echo "#### pwd: $(pwd)"
-        echo "#### root_path: $ROOT_PATH"
-        echo $CONSOLE_BR
-        
-		#############################
-		# Configure host network 
-		#############################
-		# Network config file is stored in Global folder: /00_Global/
-		
-		pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
-		
-    
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        #++++++++++ RUN NODE 
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        #### for each folder (node) inside role root folder: 
-        for NODE in [1-9]*; do
-    	    echo "+++++++++++ NODE: $NODE +++++++++++"
-            echo $CONSOLE_BR
+	echo $CONSOLE_BR
+	echo "+++++++++++ ROLE: $ROLE +++++++++++"
+	#### go to $ROLE folder:
+	cd $ROLE/
+	ROOT_PATH="../$ROOT_PATH"
+	echo "#### pwd: $(pwd)"
+	echo "#### root_path: $ROOT_PATH"
+	echo $CONSOLE_BR
 	
-            #############################
-            # Define NODE vars 
-            #############################
-           
-	    # VARS for NODE are stored in "Node" file include in each node folder for each role 
-	    getVars $NODE"/Node" "NODE_NAME"
-        echo $CONSOLE_BR
+	#############################
+	# Configure host network 
+	#############################
+	# Network config file is stored in Global folder: /00_Global/
+	
+	pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
+	
+
+	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	#++++++++++ RUN NODE 
+	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	#### for each folder (node) inside role root folder: 
+	for NODE in [1-9]*; do
+		echo "+++++++++++ NODE: $NODE +++++++++++"
+		echo $CONSOLE_BR
+
+		#############################
+		# Define NODE vars 
+		#############################
 	   
-	    # test folder is patern validated:
-    	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
-    		# yes folder name follows patern
-    		DEFAULT="N"
-                echo $CONSOLE_HL
-    		read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
-    		PROCEED="${PROCEED:-${DEFAULT}}"
-    		if [ "${PROCEED}" == "y" ] ; then
-            	    echo ">>>> Node $NODE: Installing"
-                    echo $CONSOLE_BR
-		    cd $NODE/
-	            ROOT_PATH="../$ROOT_PATH"
-                    echo "#### pwd: $(pwd)"
-                    echo "#### root_path: $ROOT_PATH"
-                    echo $CONSOLE_BR
-                    echo " - - ROSRUN_EXE=$ROSRUN_EXE"
-                    echo $CONSOLE_BR
-                    
-	            #############################
-                    # Run 1g_update to create simlinks and copy files to local for first time 
-                    #############################
-                    
-                    DEFAULT="y"
-                    echo $CONSOLE_HL
-		    read -e -p ":::: Run 1g_update program to update files in node directory ($NODE)  ? [N/y/q] ": PROCEED
-                    PROCEED="${PROCEED:-${DEFAULT}}"
-                    if [ "${PROCEED}" == "y" ] ; then 
-                       echo ">>>> Run 1g_update.sh" 
-                       echo $CONSOLE_BR 
+	# VARS for NODE are stored in "Node" file include in each node folder for each role 
+	getVars $NODE"/Node" "NODE_NAME"
+	echo $CONSOLE_BR
+   
+	# test folder is patern validated:
+		#if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
+		# yes folder name follows patern
+		DEFAULT="N"
+			echo $CONSOLE_HL
+		read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
+		PROCEED="${PROCEED:-${DEFAULT}}"
+		if [ "${PROCEED}" == "y" ] ; then
+				echo ">>>> Node $NODE: Installing"
+				echo $CONSOLE_BR
+		cd $NODE/
+			ROOT_PATH="../$ROOT_PATH"
+				echo "#### pwd: $(pwd)"
+				echo "#### root_path: $ROOT_PATH"
+				echo $CONSOLE_BR
+				echo " - - ROSRUN_EXE=$ROSRUN_EXE"
+				echo $CONSOLE_BR
+				
+			#############################
+				# Run 1g_update to create simlinks and copy files to local for first time 
+				#############################
+				
+				DEFAULT="y"
+				echo $CONSOLE_HL
+		read -e -p ":::: Run 1g_update program to update files in node directory ($NODE)  ? [N/y/q] ": PROCEED
+				PROCEED="${PROCEED:-${DEFAULT}}"
+				if [ "${PROCEED}" == "y" ] ; then 
+				   echo ">>>> Run 1g_update.sh" 
+				   echo $CONSOLE_BR 
 
-		       source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
+		   source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
 
-                       echo "#### 0_install.sh execution finished" 
-                    else
-                       echo "#### 1g_update program running aborded !"
-                    fi
-                    echo $CONSOLE_BR 
-
-
-	            #############################
-                    # Run  
-                    #############################
+				   echo "#### 0_install.sh execution finished" 
+				else
+				   echo "#### 1g_update program running aborded !"
+				fi
+				echo $CONSOLE_BR 
 
 
-        		echo "#### Node $i: Installation done"
-    		else
-        		echo "#### Installation $i aborded !"
-    		fi
-                echo $CONSOLE_BR 
-    	    #fi
+			#############################
+				# Run  
+				#############################
+
+
+			echo "#### Node $i: Installation done"
+		else
+			echo "#### Installation $i aborded !"
+		fi
+			echo $CONSOLE_BR 
+		#fi
     done
-    
 
 else
         echo "#### invalid entry, please relaunch program after terminating"
