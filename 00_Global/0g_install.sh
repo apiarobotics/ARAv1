@@ -39,25 +39,38 @@ pushNetwork (){
 	ROLE=$1
 	NET_PATH=$2
 	
+	#test network
+	
+	if $(hostname) 
+	
+	#test cert
+	
 	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
 	
 	sudo chmod 777 /etc/hosts
 	sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
 	
+	v=0
 	echo "#### Network values from $NET_PATH are: "
 	while IFS='' read -r line || [[ -n "$line" ]]; do
-		echo "#### $line"
-		VAR_IP="${line%%=*}"
-		temp="${line%=}"
-		temp2="${temp##*=}"
-		temp3="${temp2%\"}"
-		temp4="${temp3#\"}"
-		VAR_HOST=$temp4
+		if $v != 0; then
 		
-		sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
+			#if line in file starts by ???; then
+			echo "#### $line"
+			VAR_IP="${line%%=*}"
+			temp="${line%=}"
+			temp2="${temp##*=}"
+			temp3="${temp2%\"}"
+			temp4="${temp3#\"}"
+			VAR_HOST=$temp4
+			((v++))
+			#fi
+			
+			sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
+			
+			#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+		fi		
 		
-		#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
-				
 	done < "$NET_PATH"
 	
 	cat /etc/hosts
