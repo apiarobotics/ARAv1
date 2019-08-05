@@ -1,7 +1,0 @@
-NODE_NAME="11master"
-NODE_ROLE="master"
-NODE_VERSION="0.1"
-DOCKER_RUN=" --privileged -it --rm"
-DOCKER_CMD="6g_exec.sh"
-CATKIN="No"
-ROSRUN_EXE="roscore"

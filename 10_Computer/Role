@@ -1,3 +1,0 @@
-ROLE_NAME="master"
-ROLE_IP="192.168.0.81"
-SWARM_WORKER_IP=""

@@ -3,8 +3,10 @@
 #### #### #### #### #### #### #### ####
 # DO NOT RUN this program direclty, it must be call by build based on root folder
 # IMPORTANT: Nothing has to be setup here, except 2 vars if software binaries structure has changed
+
 ROOT_PATH="./"
 GLOBAL_PATH="00_Global/"
+
 #### #### #### #### #### #### #### ####
 
 clear
@@ -39,13 +41,16 @@ pushNetwork (){
 	ROLE=$1
 	NET_PATH=$2
 	
-	#test network
+    #############################
+    # Deploying host network
+    #############################
+    
+    echo "**** Deploying: Network"
+	echo "####ROLE = "$ROLE
+	echo "#### MASTER_ROLE = "$MASTER_ROLE
+    echo $CONSOLE_BR
 	
-	#if $(hostname)
-	
-	#test cert
-	
-	if $ROLE = $MASTER_ROLE; then
+	if [ $ROLE = $MASTER_ROLE ]; then
 		sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
 	fi
 	
@@ -58,20 +63,22 @@ pushNetwork (){
 		if [ $v != 0 ]; then
 		
 			#if line in file starts by ???; then
-			echo "#### $line"
+			echo $v" #### $line"
 			VAR_IP="${line%%=*}"
 			temp="${line%=}"
 			temp2="${temp##*=}"
 			temp3="${temp2%\"}"
 			temp4="${temp3#\"}"
 			VAR_HOST=$temp4
+			
 			((v++))
 			#fi
 			
 			sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
 			
-			if $ROLE = $MASTER_ROLE; then
+			if [ $ROLE = $MASTER_ROLE ]; then
 				#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+				echo "#### copy certificate on others"
 			fi
 
 		fi
@@ -83,13 +90,18 @@ pushNetwork (){
 	echo $CONSOLE_BR
 }
 
+
 getVars (){
-    # 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
     
     VARS_PATH=$1
     PATTERN=$2 
-    
-    echo "**** Get Variables from $(pwd) / $VARS_PATH ($PATTERN)"
+	
+    #############################
+    # Getting variables
+    ############################# 
+	# 3 levels of variables are store inside flat file (00_Global/Global, ./X/Role, ./X/Y/Node)
+	
+    echo "**** Get Variables from $(pwd) / $VARS_PATH (confirmation pattern = '$PATTERN')"
     echo $CONSOLE_BR
 
     if grep -q $PATTERN $VARS_PATH; then
@@ -117,9 +129,8 @@ getVars (){
     fi
 }
 
-checkPrereq (){
-# run all prerequistes on start: docker, docker-swarm, docker-network
 
+checkPrereq (){
 
     #############################
     # Check Docker installation and install Docker if needed
@@ -128,13 +139,6 @@ checkPrereq (){
     echo "**** Checking prerequisites: Docker"
     echo $CONSOLE_BR
     
-    #echo "dpkg command: $(dpkg -l | grep docker-ce)"
-    #echo $(dpkg -l | grep docker-ce >/dev/null)
-    #echo $(dpkg -l | grep docker-ce >/dev/null)
-    #command -v docker >/dev/null
-    
-    #if [ $? -eq 0 ] ; then
-    #    echo "#### $(docker -v) is already installed: OK"
     if DOCKER_VERSION=$(sudo docker -v); then
         echo "#### $DOCKER_VERSION is already installed: OK"
     else
@@ -157,74 +161,67 @@ swarmInstall (){
     # Swarm INIT (master) or JOIN (nodes) 
     #############################
     
-    echo "**** Swarm: Deploy ?"
+    echo "**** Deploying: Swarm"
+	echo "ROLE = "$ROLE
+	echo "#### MASTER_ROLE = "$MASTER_ROLE
     echo $CONSOLE_BR
 	
-	echo $CONSOLE_HL 
-    read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
-    PROCEED="${PROCEED:-${DEFAULT}}"
-    
-    if [ "${PROCEED}" == "y" ] ; then 
-    
-		#### Swarm mode cluster role selection
-		
-		echo "ROLE = "$ROLE
-		
+	#### Swarm mode cluster role selection
+	DEFAULT="N"
+	if $ROLE = $MASTER_ROLE; then
+	
+		#### INIT confirmation ? 
 		DEFAULT="N"
-		#read -e -p ":::: INIT or JOIN swarm cluster ? [N/y/q] ": PROCEED
+		echo $CONSOLE_HL 
+		read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
+		PROCEED="${PROCEED:-${DEFAULT}}"
 		
-		#if role = master > INIT else JOIN
-		if $ROLE = $MASTER_ROLE; then
-		
-			#### INIT confirmation ? 
-
-			DEFAULT="N"
-			echo $CONSOLE_HL 
-			read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
-			PROCEED="${PROCEED:-${DEFAULT}}"
+		#### run swarm init 
+		if [ "${PROCEED}" == "y" ] ; then 
+			echo ">>>> Swarm INIT"
+			echo $CONSOLE_BR
+			docker swarm init --advertise-addr=$SWARM_MANAGER_IP
 			
-			#### run swarm init 
-
-			if [ "${PROCEED}" == "y" ] ; then 
-				echo ">>>> Swarm: INIT (master)"
-				echo $CONSOLE_BR
-				docker swarm init --advertise-addr=$SWARM_MANAGER_IP
-			else
-				echo "#### Swarm execution aborded !"
-			fi
-		
 			#### worked ? 
+			# ---------
 			
 		else
-					
-			echo $CONSOLE_HL 
-			read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
-			SWARM_TOKEN=$PROCEED
-			#### test token patern
-			# ---------
-			# ---------
-			# ---------
-			# ---------
-			# ---------
-			# ---------
+			echo "#### Swarm INIT aborded !"
+		fi
 		
-			#### try to join swarm cluster:    
-			echo ">>>> Swarm: JOIN Swarm with token '$SWARM_TOKEN'"
+	else
+				
+		echo $CONSOLE_HL 
+		read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
+		SWARM_TOKEN=$PROCEED
+		#### test token patern
+		# ---------
+
+		#### JOIN confirmation ? 
+		DEFAULT="N"
+		echo $CONSOLE_HL 
+		read -e -p ":::: Do you want to JOIN swarm cluster ? [N/y/q] ": PROCEED
+		PROCEED="${PROCEED:-${DEFAULT}}"
+		
+		#### try to join swarm cluster:   
+		if [ "${PROCEED}" == "y" ] ; then 		
+			echo ">>>> Swarm JOIN with token '$SWARM_TOKEN'"
 			echo $CONSOLE_BR
 			docker swarm join --token $SWARM_TOKEN \
 			--advertise-addr $SWARM_WORKER_IP \
 			$SWARM_MANAGER_IP:2237
-		
+			
+			#### worked ?		
+			
 			#### if doesn't work:
 			# ---------
 			
+		else
+			echo "#### Swarm JOIN aborded !"
 		fi
-		
-    else
-        echo "#### Swarm deployment aborded !"
-    fi
 	
-    echo $CONSOLE_BR 
+	fi
+		
 }
 
 
@@ -233,60 +230,48 @@ vnetworkInstall () {
     #############################
     # Create overlay network and check network name already exists 
     #############################
-    
-    DEFAULT="N"
-    echo $CONSOLE_HL 
-    read -e -p ":::: Create overlay network ? [N/y/q] ": PROCEED
-    PROCEED="${PROCEED:-${DEFAULT}}"
-    if [ "${PROCEED}" == "y" ] ; then 
-        NET_ACT="create"
-    
-        NET_CHECK=$(docker network inspect $NET_NAME --format {{.Name}})
-    
-        #### check if network with same name already exixts
-        if [ $NET_CHECK == $NET_NAME ]; then
-            DEFAULT="N"
-    
-            #### ask user what to do: delete and create or abort ? 
-            echo $CONSOLE_HL 
-            read -e -p ":::: Network $NET_NAME already exists, delete and recreate (y) or abort this step (N) ?": PROCEED
-            PROCEED="${PROCEED:-${DEFAULT}}"
-    
-            #### if user wants to remove network then create it
-            if [ "${PROCEED}" == "y" ] ; then 
-                echo ">>>> Docker: Removing network named '$NET_NAME'"
-                echo $CONSOLE_BR
-                echo "#### Docker network: $(docker network rm $NET_NAME) removed !" 
-                echo $CONSOLE_BR
-                NET_ACT="create"
-            #### else user wants to abort process
-            else
-                NET_ACT="abort"
-                echo "#### Network creation aborded !"
-                echo $CONSOLE_BR
-            fi
-       fi 
-    
-       #### if request is create the network
-       if [ $NET_ACT == "create" ]; then
-           echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
-           echo $CONSOLE_BR
-           
-	   if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
-               echo "#### Docker network: $?"
-           else
-               echo "!!!! Network not working !"
-           fi
-           echo $CONSOLE_BR
-       fi
-    
-    else
-        echo "#### Network creation aborded !"
-    fi
-    
-    echo $CONSOLE_BR 
+    	
+	NET_ACT="create"
 
+	NET_CHECK=$(docker network inspect $NET_NAME --format {{.Name}})
 
+	#### check if network with same name already exixts
+	if [ $NET_CHECK == $NET_NAME ]; then
+		DEFAULT="N"
+
+		#### ask user what to do: delete and create or abort ? 
+		echo $CONSOLE_HL 
+		read -e -p ":::: Network $NET_NAME already exists, delete and recreate (y) or abort this step (N) ?": PROCEED
+		PROCEED="${PROCEED:-${DEFAULT}}"
+
+		#### if user wants to remove network then create it
+		if [ "${PROCEED}" == "y" ] ; then 
+			echo ">>>> Docker: Removing network named '$NET_NAME'"
+			echo $CONSOLE_BR
+			echo "#### Docker network: $(docker network rm $NET_NAME) removed !" 
+			echo $CONSOLE_BR
+			NET_ACT="create"
+		#### else user wants to abort process
+		else
+			NET_ACT="abort"
+			echo "#### Network creation aborded !"
+			echo $CONSOLE_BR
+		fi
+   fi 
+
+   #### if request is create the network
+   if [ $NET_ACT == "create" ]; then
+	   echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
+	   echo $CONSOLE_BR
+	   
+   if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
+		   echo "#### Docker network: $?"
+	   else
+		   echo "!!!! Network not working !"
+	   fi
+	   echo $CONSOLE_BR
+   fi
+ 
 }
 
 
@@ -408,6 +393,7 @@ if [[ $ROLE ]]; then
 	echo ">>>> Starting installer program"
 	echo $CONSOLE_BR
 	echo "+++++++++++ ROLE: $ROLE +++++++++++"
+	echo $CONSOLE_BR
 	#### go to $ROLE folder:
 	cd $ROLE/
 	ROOT_PATH="../$ROOT_PATH"
@@ -420,8 +406,51 @@ if [[ $ROLE ]]; then
 	#############################
 	# Network config file is stored in Global folder: /00_Global/
 	
-	pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
+	DEFAULT="N"
+	echo $CONSOLE_HL
+	read -e -p ":::: Proceed network setup ? [N/y/q]:" PROCEED
+	PROCEED="${PROCEED:-${DEFAULT}}"
+	if [ "${PROCEED}" == "y" ] ; then
 	
+		pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
+		
+	else
+		echo "#### Network setup aborded !"
+	fi
+	echo $CONSOLE_BR 
+	
+
+	#############################
+	# Deploy swarm 
+	#############################	
+	
+	echo $CONSOLE_HL 
+    read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
+    PROCEED="${PROCEED:-${DEFAULT}}"
+    
+    if [ "${PROCEED}" == "y" ] ; then 
+		swarmInstall
+	else
+        echo "#### Swarm deployment aborded !"
+    fi
+	
+    echo $CONSOLE_BR 
+	
+	#############################
+	# Deploy virtual network (Docker) 
+	#############################	
+	
+	echo $CONSOLE_HL 
+    read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
+    PROCEED="${PROCEED:-${DEFAULT}}"
+    
+    if [ "${PROCEED}" == "y" ] ; then 
+		vnetworkInstall
+	else
+        echo "#### Virtual network deployment aborded !"
+    fi
+	
+    echo $CONSOLE_BR 
 
 	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	#++++++++++ RUN NODE 
@@ -444,7 +473,7 @@ if [[ $ROLE ]]; then
 		#if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
 		# yes folder name follows patern
 		DEFAULT="N"
-			echo $CONSOLE_HL
+		echo $CONSOLE_HL
 		read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
 		PROCEED="${PROCEED:-${DEFAULT}}"
 		if [ "${PROCEED}" == "y" ] ; then
