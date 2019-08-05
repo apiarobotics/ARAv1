@@ -1,0 +1,7 @@
+NODE_NAME="35environment"
+NODE_ROLE="environment"
+NODE_VERSION="0.1"
+DOCKER_RUN=" --privileged -it --rm"
+DOCKER_CMD="6g_exec.sh"
+CATKIN="Yes"
+ROSRUN_EXE="node_weather.py"
