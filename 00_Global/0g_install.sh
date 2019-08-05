@@ -56,11 +56,13 @@ pushNetwork (){
 			
 			sudo echo "$VAR_NAME $VAR_HOST" >> /etc/hosts
 			
-			sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+			#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
 					
         done < "$NET_PATH"
 	
+	cat /etc/hosts
 	sudo chmod 644 /etc/hosts
+	echo $CONSOLE_BR
 }
 
 getVars (){
