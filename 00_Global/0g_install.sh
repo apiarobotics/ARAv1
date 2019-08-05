@@ -53,8 +53,6 @@ pushNetwork (){
 			temp3="${temp2%\"}"
 			temp4="${temp3#\"}"
 			VAR_HOST=$temp4
-			export $VAR_IP="$VAR_HOST"
-			#echo $VAR_IP"="$VAR_HOST
 			
 			sudo echo "$VAR_NAME $VAR_HOST" >> /etc/hosts
 			
