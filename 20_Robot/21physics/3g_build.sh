@@ -1,0 +1,1 @@
+../.././00_Global/3g_build.sh
