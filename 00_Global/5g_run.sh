@@ -25,11 +25,14 @@ echo "#### DOCKER_CMD=$DOCKER_CMD"
 echo $CONSOLE_BR 
 
 (set -x; pwd)
-echo $CONSOLE_BR 
+echo $CONSOLE_BR
 
-#sudo docker run $DOCKER_RUN --net $NET_NAME --ip $NODE_IP -w '/root' --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD
+# ADD "--net " docker command if $NET_NAME exists
+if [ !$NET_NAME ]; then
+	$NET_NAME="--net "$NET_NAME
+fi
 
-(set -x; sudo docker run $DOCKER_RUN --net $NET_NAME --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
+(set -x; sudo docker run $DOCKER_RUN $NET_NAME --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
 
 echo "#### Docker run finished"
 echo $CONSOLE_BR 

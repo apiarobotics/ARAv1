@@ -228,13 +228,13 @@ swarmInstall (){
 
 vnetworkCreate () {
 
-    NET_NAME=$1
+    SWARM_NET=$1
     APP_SUBNET=$2
 
-    echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
+    echo ">>>> Docker: Creating overlay network named '$SWARM_NET'"
     echo $CONSOLE_BR
 	   
-    if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
+    if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $SWARM_NET); then
 	 echo "#### Docker network: $?"
     else
          echo "!!!! Network creation doesn't work !"
@@ -245,11 +245,11 @@ vnetworkCreate () {
 
 vnetworkDelete () {
     
-    NET_NAME=$1
+    SWARM_NET=$1
 
-    echo ">>>> Docker: Removing network named '$NET_NAME'"
+    echo ">>>> Docker: Removing network named '$SWARM_NET'"
     echo $CONSOLE_BR
-    echo "#### Docker network: $(sudo docker network rm $NET_NAME) removed !" 
+    echo "#### Docker network: $(sudo docker network rm $SWARM_NET) removed !" 
     echo $CONSOLE_BR
 
 }
@@ -260,26 +260,26 @@ vnetworkInstall () {
     # Check existing network
     #############################
    
-    NET_NAME=$1
+    SWARM_NET=$1
     APP_SUBNET=$2
 
     # check if network with same name already exixts
-    NET_CHECK=$(sudo docker network inspect $NET_NAME --format {{.Name}})
+    NET_CHECK=$(sudo docker network inspect $SWARM_NET --format {{.Name}})
 
     # if same network already exists: master -> delete / other -> join 
     if [ $NET_CHECK != "" && $NET_CHECK = $NET_ACT ]; then
 
-       echo "#### NET_NAME = $NET_NAME"
+       echo "#### SWARM_NET = $SWARM_NET"
        echo "#### NET_CHECK = $NET_CHECK"
        
        DEFAULT="q"
        echo $CONSOLE_HL
-       read -e -p ":::: Confirm renew network '$NET_NAME' [y] or [q] to quit": PROCEED
+       read -e -p ":::: Confirm renew network '$SWARM_NET' [y] or [q] to quit": PROCEED
        PROCEED="${PROCEED:-${DEFAULT}}"
        
        if [ "${PROCEED}" == "y" ] ; then
-           vnetworkDelete $NET_NAME
-           vnetworkCreate $NET_NAME $APP_SUBNET
+           vnetworkDelete $SWARM_NET
+           vnetworkCreate $SWARM_NET $APP_SUBNET
        else
            echo "#### Network renewal process aborded !"
        fi 
@@ -287,7 +287,7 @@ vnetworkInstall () {
              
 
     else # if network doesn't exist -> create it
-        vnetworkCreate $NET_NAME $APP_SUBNET 
+        vnetworkCreate $SWARM_NET $APP_SUBNET 
     fi
 	
 }
@@ -456,7 +456,7 @@ if [[ $ROLE ]]; then
         read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
         PROCEED="${PROCEED:-${DEFAULT}}"
         if [ "${PROCEED}" == "y" ] ; then 
-            vnetworkInstall $NET_NAME $APP_SUBNET
+            vnetworkInstall $SWARM_NET $APP_SUBNET
 	else
             echo "#### Virtual network deployment aborded !"
         fi

@@ -1,6 +1,8 @@
 NODE_NAME="35environment"
 NODE_ROLE="environment"
 NODE_VERSION="0.1"
+DOCKERFILE="Dockerfile-ROS"
+DOCKER_NET="Default"
 DOCKER_RUN=" --privileged -it --rm"
 DOCKER_CMD="6g_exec.sh"
 CATKIN="Yes"
