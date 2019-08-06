@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+(set -x; sudo mount /dev/sda1 /mnt/usb01)
+(set -x; sudo mount /dev/sdb1 /mnt/usb02)
+(set -x; sudo mount /dev/sdc1 /mnt/usb03)
+
+
+
+
+(set -x; sudo mkfs.ext4 -F /dev/md0)
+(set -x; sudo mkdir -p /mnt/raid)
+(set -x; sudo mount /dev/md0 /mnt/raid)
+(set -x; sudo f -h -x devtmpfs -x tmpfs)
