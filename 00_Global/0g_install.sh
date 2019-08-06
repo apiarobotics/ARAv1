@@ -538,6 +538,3 @@ else
         echo "#### invalid entry, please relaunch program after terminating"
         echo $CONSOLE_BR
 fi
-
-echo "#### installation aborded !"
-echo $CONSOLE_BR

@@ -53,7 +53,8 @@ echo $CONSOLE_HL
 
 echo ">>>> Removing obsolete globals"
 rm -rf [0-9]g*
-rm -rf Dockerfile
+#rm -rf Dockerfile
+rm -rf Dockerfile*
 echo "#### Obsolete globals removed"
 
 echo ">>>> Creating globals simlinks [1-5]"
@@ -65,7 +66,8 @@ cp $ROOT_PATH""$GLOBAL_PATH[6-9]* ./
 echo "#### Globals files copied"
 
 echo ">>>> Creating Dockerfile simlink"
-ln -s $ROOT_PATH""$GLOBAL_PATH"Dockerfile" ./
+#ln -s $ROOT_PATH""$GLOBAL_PATH"Dockerfile" ./
+ln -s $ROOT_PATH""$GLOBAL_PATH"Dockerfile"* ./
 echo "#### Dockerfile simlink created"
 
 chmod +x ./*

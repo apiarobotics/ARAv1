@@ -12,7 +12,7 @@ export ROS_MASTER_URI="$ROS_MASTER_URI"
 echo "NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
-        master)
+        roscore)
             
             ########################################################################
             # ROSRUN: Run ROSCORE 

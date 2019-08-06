@@ -34,32 +34,32 @@ if [ "$CATKIN" ==  "Yes" ]; then
     echo "~~~~ source ROS devel/setup.bash"
     source devel/setup.bash
     
-        cd src/
-        echo "~~~~ go to $(pwd)"
+    cd src/
+    echo "~~~~ go to $(pwd)"
         
-        echo "~~~~ create ROS package: $NODE_NAME"
-        catkin_create_pkg $NODE_NAME std_msgs rospy
-        echo "~~~~ go to $(pwd)"
+    echo "~~~~ create ROS package: $NODE_NAME"
+    catkin_create_pkg $NODE_NAME std_msgs rospy
+    echo "~~~~ go to $(pwd)"
         
-        echo "~~~~ move .py source files to new node src folder: $NODE_NAME/src/"
-        cd $NODE_NAME/src
-        echo "~~~~ go to $(pwd)"
-        mv ../../*.py ./
+    echo "~~~~ move .py source files to new node src folder: $NODE_NAME/src/"
+    cd $NODE_NAME/src
+    echo "~~~~ go to $(pwd)"
+    mv ../../*.py ./
         
-        echo "~~~~ make src files executable mod in folder: /root/catkin_ws/src/$NODE_NAME/src/"
-        chmod +x ./*
-        echo "~~~~ show files in dir: $(pwd)"
-        ls -la ./ 
-        echo $CONSOLE_BR
+    echo "~~~~ make src files executable mod in folder: /root/catkin_ws/src/$NODE_NAME/src/"
+    chmod +x ./*
+    echo "~~~~ show files in dir: $(pwd)"
+    ls -la ./ 
+    echo $CONSOLE_BR
         
-        cd ../../../
-        echo "~~~~ go to $(pwd)"
+    cd ../../../
+    echo "~~~~ go to $(pwd)"
         
-        echo "~~~~ run ROS catkin_make install"
-        catkin_make install
+    echo "~~~~ run ROS catkin_make install"
+    catkin_make install
         
-        echo "~~~~ source ROS devel/setup.bash"
-        source devel/setup.bash
+    echo "~~~~ source ROS devel/setup.bash"
+    source devel/setup.bash
 
 else
     echo "#### No catkin pack to deploy"
