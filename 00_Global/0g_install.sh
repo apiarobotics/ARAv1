@@ -4,8 +4,10 @@
 # DO NOT RUN this program direclty, it must be call by build based on root folder
 # IMPORTANT: Nothing has to be setup here, except 2 vars if software binaries structure has changed
 
-ROOT_PATH="./"
+ROOT_PATH="$(pwd)/"
+echo "root_path= "$ROOT_PATH
 GLOBAL_PATH="00_Global/"
+echo "global_path= "$GLOBAL_PATH
 
 #### #### #### #### #### #### #### ####
 
@@ -104,7 +106,7 @@ getVars (){
 
     if grep -q $PATTERN $VARS_PATH; then
         # path:
-        /bin/bash $VARS_PATH
+	(set -x; /bin/bash $VARS_PATH)
         
 	# read file 
         #echo "#### Param values from $VARS_PATH are: "
@@ -407,9 +409,10 @@ if [[ $ROLE ]]; then
 	echo $CONSOLE_BR
 	#### go to $ROLE folder:
 	cd $ROLE/
-	ROOT_PATH="../$ROOT_PATH"
-	echo "#### pwd: $(pwd)"
+	#ROOT_PATH="../$ROOT_PATH"
 	echo "#### root_path: $ROOT_PATH"
+	echo "#### role_path: $ROLE"
+	echo "#### pwd: $(pwd)"
 	echo $CONSOLE_BR
 
 
@@ -493,12 +496,15 @@ if [[ $ROLE ]]; then
 		echo ">>>> Node $NODE: Installing"
 		echo $CONSOLE_BR
 		cd $NODE/
-		ROOT_PATH="../$ROOT_PATH"
-		echo "#### pwd: $(pwd)"
+		#ROOT_PATH="../$ROOT_PATH"
 		echo "#### root_path: $ROOT_PATH"
+		echo "#### role_path: $ROLE"
+		echo "#### node_path: $NODE"
+		echo "#### pwd: $(pwd)"
 		echo $CONSOLE_BR
-		echo " - - ROSRUN_EXE=$ROSRUN_EXE"
-		echo $CONSOLE_BR
+		
+		#echo "ROSRUN_EXE=$ROSRUN_EXE"
+		#echo $CONSOLE_BR
 				
 		#############################
 		# Run 1g_update to create simlinks and copy files to local for first time 

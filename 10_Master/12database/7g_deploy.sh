@@ -19,7 +19,7 @@ if [ "$CATKIN" ==  "Yes" ]; then
     echo ":::: Deploy application with Catkin"
         echo $CONSOLE_BR
     
-    echo ">>>> Starting $NODE_NAME deploy process"
+	echo ">>>> Starting ($ROSPKG_PRE)$NODE_NAME deploy process"
         echo $CONSOLE_BR
     
     echo "~~~~ source ROS opt/ros/melodic/setup.bash"
@@ -37,16 +37,16 @@ if [ "$CATKIN" ==  "Yes" ]; then
     cd src/
     echo "~~~~ go to $(pwd)"
         
-    echo "~~~~ create ROS package: $NODE_NAME"
-    catkin_create_pkg $NODE_NAME std_msgs rospy
+    echo "~~~~ create ROS package: $ROSPKG_PRE""$NODE_NAME"
+    catkin_create_pkg $ROSPKG_PRE""$NODE_NAME std_msgs rospy
     echo "~~~~ go to $(pwd)"
         
-    echo "~~~~ move .py source files to new node src folder: $NODE_NAME/src/"
-    cd $NODE_NAME/src
+    echo "~~~~ move .py source files to new node src folder: $ROSPKG_PRE""$NODE_NAME/src/"
+    cd $ROSPKG_PRE""$NODE_NAME/src
     echo "~~~~ go to $(pwd)"
     mv ../../*.py ./
         
-    echo "~~~~ make src files executable mod in folder: /root/catkin_ws/src/$NODE_NAME/src/"
+    echo "~~~~ make src files executable mod in folder: /root/catkin_ws/src/$ROSPKG_PRE""$NODE_NAME/src/"
     chmod +x ./*
     echo "~~~~ show files in dir: $(pwd)"
     ls -la ./ 
@@ -66,6 +66,6 @@ else
 fi        
 echo $CONSOLE_BR
 
-echo "#### Application $NODE_NAME deploy processing finished"
+echo "#### Application ($ROSPKG_PRE)$NODE_NAME deploy processing finished"
 echo $CONSOLE_BR
 
