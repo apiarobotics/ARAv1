@@ -30,12 +30,12 @@ echo $CONSOLE_BR
 
 # ADD "--net " docker command if $SWARM_NET exists
 if [ $DOCKER_NET != "" ]; then
-	case $DOCKER_NET
-	    Default)
-		$DOCKER_NET="--net "$SWARM_NET
+	case "$DOCKER_NET" in
+	    "Default" )
+		    DOCKER_NET="--net $SWARM_NET"
 	         ;;
-	    *)
-		$DOCKER_NET="--net "$DOCKER_NET
+	    * )
+		    DOCKER_NET="--net $DOCKER_NET"
 	         ;;
 	esac
 fi
