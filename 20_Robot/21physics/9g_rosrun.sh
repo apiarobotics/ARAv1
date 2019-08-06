@@ -12,7 +12,7 @@ export ROS_MASTER_URI="$ROS_MASTER_URI"
 echo "NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
-        master)
+        roscore)
             
             ########################################################################
             # ROSRUN: Run ROSCORE 
@@ -38,7 +38,7 @@ case "$NODE_ROLE" in
             echo "~~~~ go to $(pwd)"
             
             echo "~~~~ execute rosrun (node_name: $NODE_NAME, rosrun_exe: $ROSRUN_EXE)"
-            rosrun $NODE_NAME $ROSRUN_EXE
+            rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE
             
             echo "#### $NODE_NAME finished"
             echo $CONSOLE_BR 

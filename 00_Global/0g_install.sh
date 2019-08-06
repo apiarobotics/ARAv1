@@ -526,9 +526,9 @@ if [[ $ROLE ]]; then
 		#############################
 
 
-		echo "#### Node $i: Installation done"
+		echo "#### Node $NODE: Installation done"
 	    else
-		echo "#### Installation $i aborded !"
+		echo "#### Installation $NODE aborded !"
 	    fi
 	    echo $CONSOLE_BR 
 	    #fi
