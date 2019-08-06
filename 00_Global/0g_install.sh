@@ -50,9 +50,9 @@ pushNetwork (){
     echo "#### MASTER_ROLE = "$MASTER_ROLE
     echo $CONSOLE_BR
 	
-    if [ $ROLE = $MASTER_ROLE ]; then
-	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
-    fi
+    #if [ $ROLE = $MASTER_ROLE ]; then
+    #	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
+    #fi
 	
     sudo chmod 777 /etc/hosts
     sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
@@ -74,10 +74,10 @@ pushNetwork (){
 			
 	    sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
 		
-	    if [ $ROLE = $MASTER_ROLE ]; then
-		#sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
-		echo "#### copy certificate on others"
-	    fi
+	    #if [ $ROLE = $MASTER_ROLE ]; then
+	    #	sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+	    #	echo "#### copy certificate on others"
+	    #fi
 
 		
     done < "$NET_PATH"
