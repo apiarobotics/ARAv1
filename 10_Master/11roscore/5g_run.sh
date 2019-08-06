@@ -1,1 +1,1 @@
-../.././00_Global/5g_run.sh
+/home/ubuntu/ARAv1/00_Global/5g_run.sh

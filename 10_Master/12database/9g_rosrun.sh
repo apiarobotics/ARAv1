@@ -27,10 +27,11 @@ case "$NODE_ROLE" in
             ########################################################################
             # DATABASE 
             ########################################################################
-            #echo ">>>> Starting ROSCORE"
-            #echo $CONSOLE_BR 
-            #roscore 
-            #echo "#### ROSCORE finished"
+            echo ">>>> Starting DATABASE"
+            echo $CONSOLE_BR 
+            mongod --bind_ip_all
+	    #$DB_NAME $DB_CMD
+            echo "#### DATABASE finished"
             echo $CONSOLE_BR 
             ;;
         *)

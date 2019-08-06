@@ -1,1 +1,1 @@
-../.././00_Global/3g_build.sh
+/home/ubuntu/ARAv1/00_Global/3g_build.sh
