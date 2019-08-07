@@ -4,12 +4,8 @@
 # Define vars
 ########################################################################
 
-#. ./Local
-#. ./Global
-
-echo "ROS_MASTER_URI = $ROS_MASTER_URI"
-export ROS_MASTER_URI="$ROS_MASTER_URI"
-echo "NODE_ROLE = $NODE_ROLE"
+echo "#### NODE_NAME = $NODE_NAME"
+echo "#### NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
         roscore)
@@ -45,7 +41,7 @@ case "$NODE_ROLE" in
             echo "~~~~ go to $(pwd)"
             echo $CONSOLE_BR 
             
-            echo "ROS_MASTER_URI = $ROS_MASTER_URI"
+            echo "#### ROS_MASTER_URI = $ROS_MASTER_URI"
             echo $CONSOLE_BR 
             
 	    echo "~~~~ execute rosrun (node_name: $NODE_NAME, rosrun_exe: $ROSRUN_EXE)"

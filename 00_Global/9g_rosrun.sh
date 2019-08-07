@@ -4,12 +4,8 @@
 # Define vars
 ########################################################################
 
-#. ./Local
-#. ./Global
-
-echo "ROS_MASTER_URI = $ROS_MASTER_URI"
-export ROS_MASTER_URI="$ROS_MASTER_URI"
-echo "NODE_ROLE = $NODE_ROLE"
+echo "#### NODE_NAME = $NODE_NAME"
+echo "#### NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
         roscore)
@@ -45,10 +41,19 @@ case "$NODE_ROLE" in
 	    #(set -x; source catkin_ws/devel/setup.bash)
 	    source catkin_ws/devel/setup.bash
             
+<<<<<<< HEAD
             echo "~~~~ go to: catkin_ws/src"
 	    (set -x; cd catkin_ws/src)
 	    echo $(pwd)
             echo $CONSOLE_BR
+=======
+            cd catkin_ws/src/
+            echo "~~~~ go to $(pwd)"
+            echo $CONSOLE_BR 
+            
+            echo "#### ROS_MASTER_URI = $ROS_MASTER_URI"
+            echo $CONSOLE_BR 
+>>>>>>> 7a359a450b0bc7974632ba29294b5f32a820a84c
             
 	    echo "~~~~ execute: rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE"
 	    #(set -x; rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE)
