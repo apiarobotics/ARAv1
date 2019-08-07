@@ -40,7 +40,7 @@ if [ $DOCKER_NET != "" ]; then
 	esac
 fi
 
-(set -x; sudo docker run $DOCKER_RUN $DOCKER_NET --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
+(set -x; sudo docker run -e "ROS_MASTER_URI=$ROS_MASTER_URI" $DOCKER_RUN $DOCKER_NET --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
 
 echo "#### Docker run finished"
 echo $CONSOLE_BR 
