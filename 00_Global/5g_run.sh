@@ -39,13 +39,9 @@ if [ $DOCKER_NET != "" ]; then
 	esac
 fi
 
-<<<<<<< HEAD
-(set -x; sudo docker run -e "ROS_MASTER_URI=$ROS_MASTER_URI" $DOCKER_RUN $DOCKER_NET --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
-=======
 #(set -x; sudo docker run $DOCKER_RUN $DOCKER_NET --ip $ROLE_IP -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
 
-(set -x; sudo docker run $DOCKER_RUN $DOCKER_NET --hostname $NODE_NAME -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
->>>>>>> 7a359a450b0bc7974632ba29294b5f32a820a84c
+(set -x; sudo docker run -e "ROS_MASTER_URI=$ROS_MASTER_URI" $DOCKER_RUN $DOCKER_NET --hostname $NODE_NAME -w /root --name $NODE_NAME $REPO_NAME/$NODE_NAME:$NODE_VERSION /bin/bash $DOCKER_CMD)
 
 echo "#### Docker run finished"
 echo $CONSOLE_BR 
