@@ -1,4 +1,0 @@
-#Network (do not delete this line)
-192.168.0.81="10_Master"
-192.168.0.82="20_Robot"
-192.168.0.83="30_Capture"

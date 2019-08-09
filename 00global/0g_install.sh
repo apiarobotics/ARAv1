@@ -9,7 +9,7 @@ clear
 
 ROOT_PATH="$(pwd)/"
 echo "root_path= "$ROOT_PATH
-GLOBAL_PATH="00_Global/"
+GLOBAL_PATH="00global/"
 echo "global_path= "$GLOBAL_PATH
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
