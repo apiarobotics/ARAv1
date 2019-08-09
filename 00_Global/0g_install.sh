@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+<<<<<<< HEAD
 #### #### #### #### #### #### #### ####
 # DO NOT RUN this program direclty, it must be call by build based on root folder
 # IMPORTANT: Nothing has to be setup here, except 2 vars if software binaries structure has changed
+=======
+# Do not run this program directly
+
+clear
+>>>>>>> master
 
 ROOT_PATH="$(pwd)/"
 echo "root_path= "$ROOT_PATH
