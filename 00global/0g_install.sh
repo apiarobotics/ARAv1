@@ -144,87 +144,15 @@ checkPrereq (){
 }
 
 
-swarmInstall (){
-
-    #############################
-    # Swarm INIT (master) or JOIN (nodes) 
-    #############################
-    
-    echo "**** Deploying: Swarm"
-    echo "#### ROLE = "$ROLE
-    echo "#### MASTER_ROLE = "$MASTER_ROLE
-    echo $CONSOLE_BR
-	
-    #### Swarm mode cluster: role is master (INIT)
-    if [ $ROLE = $MASTER_ROLE ]; then
-	
-	#### INIT confirmation ? 
-	DEFAULT="N"
-	echo $CONSOLE_HL 
-	read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
-	PROCEED="${PROCEED:-${DEFAULT}}"
-		
-	#### run swarm init 
-	if [ "${PROCEED}" == "y" ] ; then 
-		echo ">>>> Swarm INIT"
-		echo $CONSOLE_BR
-		echo "docker swarm init --advertise-addr=$SWARM_MASTER_IP" ## delete echo to activate
-		echo $(sudo swarm init --advertise-addr=$SWARM_MASTER_IP)
-		#echo $(sudo swarm init)
-			
-	        #### worked ? 
-	        # ---------
-			
-	else
-		echo "#### Swarm INIT aborded !"
-	fi
-		
-    else # Swarm mode cluster: role is other (JOIN)
-				
-	echo $CONSOLE_HL 
-	read -e -p ":::: Please fill the swarm token given at swarm cluster creation step: [q] to abort ": PROCEED
-	SWARM_TOKEN=$PROCEED
-	#### test token patern
-	# ---------
-
-	#### JOIN confirmation ? 
-	DEFAULT="N"
-	echo $CONSOLE_HL 
-	read -e -p ":::: Do you want to JOIN swarm cluster ? [N/y/q] ": PROCEED
-	PROCEED="${PROCEED:-${DEFAULT}}"
-		
-	#### try to join swarm cluster:   
-	if [ "${PROCEED}" == "y" ] ; then 		
-		echo ">>>> Swarm JOIN with token '$SWARM_TOKEN'"
-		echo $CONSOLE_BR
-		echo "sudo docker swarm join --token $SWARM_TOKEN $SWARM_MASTER_IP:2237" # delete echo to activate
-		#echo "sudo docker swarm join --token $SWARM_TOKEN --advertise-addr $SWARM_WORKER_IP $SWARM_MASTER_IP:2237" # delete echo to activate
-		echo $(sudo docker swarm join --token $SWARM_TOKEN $SWARM_MASTER_IP:2237)
-
-
-		#### worked
-	        	
-			
-		#### if doesn't work:
-		# ---------
-			
-	else
-		echo "#### Swarm JOIN aborded !"
-	fi
-	
-    fi
-		
-}
-
 vnetworkCreate () {
 
-    SWARM_NET=$1
+    NET_NAME=$1
     APP_SUBNET=$2
 
-    echo ">>>> Docker: Creating overlay network named '$SWARM_NET'"
+    echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
     echo $CONSOLE_BR
 	   
-    if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $SWARM_NET); then
+    if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
 	 echo "#### Docker network: $?"
     else
          echo "!!!! Network creation doesn't work !"
@@ -235,11 +163,11 @@ vnetworkCreate () {
 
 vnetworkDelete () {
     
-    SWARM_NET=$1
+    NET_NAME=$1
 
-    echo ">>>> Docker: Removing network named '$SWARM_NET'"
+    echo ">>>> Docker: Removing network named '$NET_NAME'"
     echo $CONSOLE_BR
-    echo "#### Docker network: $(sudo docker network rm $SWARM_NET) removed !" 
+    echo "#### Docker network: $(sudo docker network rm $NET_NAME) removed !" 
     echo $CONSOLE_BR
 
 }
@@ -250,26 +178,26 @@ vnetworkInstall () {
     # Check existing network
     #############################
    
-    SWARM_NET=$1
+    NET_NAME=$1
     APP_SUBNET=$2
 
     # check if network with same name already exixts
-    NET_CHECK=$(sudo docker network inspect $SWARM_NET --format {{.Name}})
+    NET_CHECK=$(sudo docker network inspect $NET_NAME --format {{.Name}})
 
     # if same network already exists: master -> delete / other -> join 
     if [ $NET_CHECK != "" && $NET_CHECK = $NET_ACT ]; then
 
-       echo "#### SWARM_NET = $SWARM_NET"
+       echo "#### NET_NAME = $NET_NAME"
        echo "#### NET_CHECK = $NET_CHECK"
        
        DEFAULT="q"
        echo $CONSOLE_HL
-       read -e -p ":::: Confirm renew network '$SWARM_NET' [y] or [q] to quit": PROCEED
+       read -e -p ":::: Confirm renew network '$NET_NAME' [y] or [q] to quit": PROCEED
        PROCEED="${PROCEED:-${DEFAULT}}"
        
        if [ "${PROCEED}" == "y" ] ; then
-           vnetworkDelete $SWARM_NET
-           vnetworkCreate $SWARM_NET $APP_SUBNET
+           vnetworkDelete $NET_NAME
+           vnetworkCreate $NET_NAME $APP_SUBNET
        else
            echo "#### Network renewal process aborded !"
        fi 
@@ -277,7 +205,7 @@ vnetworkInstall () {
              
 
     else # if network doesn't exist -> create it
-        vnetworkCreate $SWARM_NET $APP_SUBNET 
+        vnetworkCreate $NET_NAME $APP_SUBNET 
     fi
 	
 }
@@ -409,7 +337,7 @@ if [[ $ROLE ]]; then
 	#############################
 	# Configure host network 
 	#############################
-	# Network config file is stored in Global folder: /00_Global/
+	# Network config file is stored in Global folder: /00global/
 	
 	DEFAULT="N"
 	echo $CONSOLE_HL
@@ -421,21 +349,6 @@ if [[ $ROLE ]]; then
 	    echo "#### Network setup aborded !"
 	fi
 	echo $CONSOLE_BR 
-	
-
-	#############################
-	# Deploy swarm 
-	#############################	
-	
-	echo $CONSOLE_HL 
-        read -e -p ":::: Do you want to deploy swarm cluster ? [N/y/q] ": PROCEED
-        PROCEED="${PROCEED:-${DEFAULT}}"
-        if [ "${PROCEED}" == "y" ] ; then 
-	   swarmInstall
-	else
-           echo "#### Swarm deployment aborded !"
-        fi
-        echo $CONSOLE_BR 
 
 
 	#############################
@@ -446,7 +359,7 @@ if [[ $ROLE ]]; then
         read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
         PROCEED="${PROCEED:-${DEFAULT}}"
         if [ "${PROCEED}" == "y" ] ; then 
-            vnetworkInstall $SWARM_NET $APP_SUBNET
+            vnetworkInstall $NET_NAME $APP_SUBNET
 	else
             echo "#### Virtual network deployment aborded !"
         fi

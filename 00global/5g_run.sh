@@ -17,7 +17,7 @@ echo $CONSOLE_BR
 echo "#### REPO_NAME=$REPO_NAME"
 echo "#### NODE_NAME=$NODE_NAME"
 echo "#### NODE_VERSION=$NODE_VERSION"
-echo "#### SWARM_NET=$SWARM_NET"
+echo "#### NET_NAME=$NET_NAME"
 echo "#### DOCKER_NET=$DOCKER_NET"
 echo "#### DOCKER_RUN=$DOCKER_RUN"
 echo "#### ROLE_IP=$ROLE_IP"
@@ -27,11 +27,11 @@ echo $CONSOLE_BR
 (set -x; pwd)
 echo $CONSOLE_BR
 
-# ADD "--net " docker command if $SWARM_NET exists
+# ADD "--net " docker command if $NET_NAME exists
 if [ $DOCKER_NET != "" ]; then
 	case "$DOCKER_NET" in
 	    "Default" )
-		    DOCKER_NET="--net $SWARM_NET"
+		    DOCKER_NET="--net $NET_NAME"
 	         ;;
 	    * )
 		    DOCKER_NET="--net $DOCKER_NET"
