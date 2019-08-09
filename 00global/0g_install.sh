@@ -29,10 +29,20 @@ echo "global_path= "$GLOBAL_PATH
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pushNetwork (){
+    #############################
+    # Define path to network files:
+    # - /etc/hostname
+    # - /etc/hosts
+    # - /etc/dhcpcd.conf
+    #############################
 	
     ROLE=$1
     NET_PATH=$2
-	
+    
+    FILEHOSTNAME=$USBPATH"/etc/hostname"
+    FILEHOSTS=$USBPATH"/etc/hosts"
+    FILEDHCPCD=$USBPATH"/etc/dhcpcd.conf"	
+    
     #############################
     # Deploying host network
     #############################
@@ -45,9 +55,10 @@ pushNetwork (){
     #if [ $ROLE = $MASTER_ROLE ]; then
     #	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
     #fi
-	
-    sudo chmod 777 /etc/hosts
-    sudo echo "127.0.0.1 $ROLE" >> /etc/hosts
+
+    #### edit HOSTS (/etc/hosts)    
+    sudo chmod 777 $FILEHOSTS
+    sudo echo "127.0.0.1 $ROLE" >> $FILEHOSTS
 	
     echo "#### Network values from $NET_PATH are: "
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -64,18 +75,28 @@ pushNetwork (){
 	    ((v++))
 	    #fi
 			
-	    sudo echo "$VAR_IP $VAR_HOST" >> /etc/hosts
+	    sudo echo "$VAR_IP $VAR_HOST" >> $FILEHOSTS 
 		
 	    #if [ $ROLE = $MASTER_ROLE ]; then
 	    #	sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
 	    #	echo "#### copy certificate on others"
 	    #fi
-
 		
     done < "$NET_PATH"
 	
-    cat /etc/hosts
-    sudo chmod 644 /etc/hosts
+    cat $FILEHOSTS
+    sudo chmod 644 $FILEHOSTS
+    
+
+    #### edit DHCPCD (/etc/dhcpcd.conf)
+    sudo chmod 777 $FILEDHCPCD
+
+    echo "interface eth0" >> $FILEDHCPCD
+    echo "static ip_address="$ROLE_IP"/24" >> $FILEDHCPCD
+    echo "static routers=192.168.0.254" >> $FILEDHCPCD
+    echo "static domain_name_servers=192.168.0.254" >> $FILEDHCPCD 
+
+    
     
     echo $CONSOLE_BR
 }
