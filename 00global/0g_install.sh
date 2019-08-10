@@ -56,6 +56,14 @@ pushNetwork (){
     #	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
     #fi
 
+    
+    #### edit FILEHOSTNAME (/etc/hostname)    
+    sudo chmod 777 $FILEHOSNAMET
+    sudo echo "$ROLE" > $FILEHOSTNAME
+    sudo chmod 644 $FILEHOSTNAME
+    cat $FILEHOSNAME
+
+
     #### edit HOSTS (/etc/hosts)    
     sudo chmod 777 $FILEHOSTS
     sudo echo "127.0.0.1 $ROLE" >> $FILEHOSTS
@@ -97,6 +105,9 @@ pushNetwork (){
     echo "static ip_address="$ROLE_IP"/24" >> $FILEDHCPCD
     echo "static routers=192.168.0.254" >> $FILEDHCPCD
     echo "static domain_name_servers=192.168.0.254 212.27.40.240 8.8.8.8" >> $FILEDHCPCD 
+    sudo chmod 644 $FILEDHCPCD
+
+    cat $FILEDHCPCD
     
     echo $CONSOLE_BR
 }
