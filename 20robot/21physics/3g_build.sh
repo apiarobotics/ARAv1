@@ -1,1 +1,1 @@
-/home/ubuntu/ARAv1/00_Global/3g_build.sh
+/home/pi/ARAv1/00global/3g_build.sh

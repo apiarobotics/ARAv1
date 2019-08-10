@@ -4,12 +4,8 @@
 # Define vars
 ########################################################################
 
-#. ./Local
-#. ./Global
-
-echo "ROS_MASTER_URI = $ROS_MASTER_URI"
-export ROS_MASTER_URI="$ROS_MASTER_URI"
-echo "NODE_ROLE = $NODE_ROLE"
+echo "#### NODE_NAME = $NODE_NAME"
+echo "#### NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
         roscore)
@@ -51,13 +47,14 @@ case "$NODE_ROLE" in
             echo $CONSOLE_BR
             
 	    echo "~~~~ execute: rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE"
-	    (set -x; rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE)
+	    #(set -x; rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE)
+	    rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE
             echo $CONSOLE_BR 
             
             echo "#### $NODE_NAME finished"
             echo $CONSOLE_BR 
 
-            (set -x; export ROS_MASTER_URI=$ROS_MASTER_URI)
+            export ROS_MASTER_URI=$ROS_MASTER_URI
 
             exit 1
 esac

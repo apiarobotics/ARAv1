@@ -2,6 +2,8 @@
 import rospy
 from std_msgs.msg import String
 
+#test
+
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "Physical manager catchs: %s", data.data)
     

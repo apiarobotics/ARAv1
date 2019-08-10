@@ -4,12 +4,8 @@
 # Define vars
 ########################################################################
 
-#. ./Local
-#. ./Global
-
-echo "ROS_MASTER_URI = $ROS_MASTER_URI"
-export ROS_MASTER_URI="$ROS_MASTER_URI"
-echo "NODE_ROLE = $NODE_ROLE"
+echo "#### NODE_NAME = $NODE_NAME"
+echo "#### NODE_ROLE = $NODE_ROLE"
 
 case "$NODE_ROLE" in
         roscore)

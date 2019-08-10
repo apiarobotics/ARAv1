@@ -170,10 +170,10 @@ vnetworkCreate () {
     NET_NAME=$1
     APP_SUBNET=$2
 
-    echo ">>>> Docker: Creating overlay network named '$NET_NAME'"
+    echo ">>>> Docker: Creating network named '$NET_NAME'"
     echo $CONSOLE_BR
 	   
-    if $(sudo docker network create -d overlay --attachable --subnet=$APP_SUBNET $NET_NAME); then
+    if $(sudo docker network create $NET_NAME); then
 	 echo "#### Docker network: $?"
     else
          echo "!!!! Network creation doesn't work !"
