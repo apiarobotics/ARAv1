@@ -15,11 +15,11 @@
 echo ":::: Execution processing (3 -> 5)"
 
 for i in [3-5][gd]* ; do
-    DEFAULT="N"
+    DEFAULT=$DEP_NODE
 	echo $CONSOLE_HL
-    read -e -p "Execute: $i ? [N/y/q]:" PROCEED
+    read -e -p "Execute: $i ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NODE):" PROCEED
     PROCEED="${PROCEED:-${DEFAULT}}"
-    if [ "${PROCEED}" == "y" ] ; then
+    if [ "${PROCEED}" == "$DEP_YES" ] ; then
         echo ">>>> Step $i: Executing"
 		echo $CONSOLE_BR
         /bin/bash $i

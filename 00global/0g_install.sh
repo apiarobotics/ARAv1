@@ -59,6 +59,7 @@ pushNetwork (){
     #### edit HOSTS (/etc/hosts)    
     sudo chmod 777 $FILEHOSTS
     sudo echo "127.0.0.1 $ROLE" >> $FILEHOSTS
+    sudo echo "" >> $FILEHOSTS
 	
     echo "#### Network values from $NET_PATH are: "
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -91,12 +92,11 @@ pushNetwork (){
     #### edit DHCPCD (/etc/dhcpcd.conf)
     sudo chmod 777 $FILEDHCPCD
 
+    echo "" >> $FILEDHCPCD
     echo "interface eth0" >> $FILEDHCPCD
     echo "static ip_address="$ROLE_IP"/24" >> $FILEDHCPCD
     echo "static routers=192.168.0.254" >> $FILEDHCPCD
-    echo "static domain_name_servers=192.168.0.254" >> $FILEDHCPCD 
-
-    
+    echo "static domain_name_servers=192.168.0.254 212.27.40.240 8.8.8.8" >> $FILEDHCPCD 
     
     echo $CONSOLE_BR
 }
@@ -211,13 +211,13 @@ vnetworkInstall () {
        echo "#### NET_NAME = $NET_NAME"
        echo "#### NET_CHECK = $NET_CHECK"
        
-       DEFAULT="q"
+       DEFAULT=$DEP_VNET_RE
        echo $CONSOLE_HL
-       read -e -p ":::: Confirm renew network '$NET_NAME' [y] or [q] to quit": PROCEED
+       read -e -p ":::: Confirm renew network '$NET_NAME' [$DEP_YES] or [$DEP_QUIT] to quit (Default: $DEP_VNET_RE": PROCEED
        PROCEED="${PROCEED:-${DEFAULT}}"
        
-       if [ "${PROCEED}" == "y" ] ; then
-           vnetworkDelete $NET_NAME
+       if [ "${PROCEED}" == "$DEP_YES" ] ; then
+           vnetworkDeletne $NET_NAME
            vnetworkCreate $NET_NAME $APP_SUBNET
        else
            echo "#### Network renewal process aborded !"
@@ -308,11 +308,8 @@ done
 echo $CONSOLE_BR
 
 #### show request form to select role to deploy (-> start install file hosted in each "role" folder) 
-DEFAULT="q"
 echo $CONSOLE_HL
 read -e -p ":::: Choose role to deploy ($list) or [q] to quit": PROCEED
-PROCEED="${PROCEED:-${DEFAULT}}"
-
 echo $CONSOLE_BR
     
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -360,11 +357,11 @@ if [[ $ROLE ]]; then
 	#############################
 	# Network config file is stored in Global folder: /00global/
 	
-	DEFAULT="N"
+	DEFAULT=$DEP_NET
 	echo $CONSOLE_HL
-	read -e -p ":::: Proceed network setup ? [N/y/q]:" PROCEED
+	read -e -p ":::: Proceed network setup ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NET):" PROCEED
 	PROCEED="${PROCEED:-${DEFAULT}}"
-	if [ "${PROCEED}" == "y" ] ; then
+	if [ "${PROCEED}" == "$DEP_YES" ] ; then
 	    pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""Network
 	else
 	    echo "#### Network setup aborded !"
@@ -377,9 +374,10 @@ if [[ $ROLE ]]; then
 	#############################	
 	
 	echo $CONSOLE_HL 
-        read -e -p ":::: Do you want to deploy Virtual network ? [N/y/q] ": PROCEED
+        DEFAULT=$DEP_VNET
+        read -e -p ":::: Do you want to deploy Virtual network ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_VNET)": PROCEED
         PROCEED="${PROCEED:-${DEFAULT}}"
-        if [ "${PROCEED}" == "y" ] ; then 
+        if [ "${PROCEED}" == "$DEP_YES" ] ; then 
             vnetworkInstall $NET_NAME $APP_SUBNET
 	else
             echo "#### Virtual network deployment aborded !"
@@ -412,11 +410,12 @@ if [[ $ROLE ]]; then
 	    # test folder is patern validated:
 	    #if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
 	    # yes folder name follows patern
-	    DEFAULT="N"
+
+	    DEFAULT=$DEP_ROLE
 	    echo $CONSOLE_HL
-	    read -e -p ":::: Proceed $NODE installation ? [N/y/q]:" PROCEED
+	    read -e -p ":::: Proceed $NODE installation ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_ROLE)": PROCEED 
 	    PROCEED="${PROCEED:-${DEFAULT}}"
-	    if [ "${PROCEED}" == "y" ] ; then
+	    if [ "${PROCEED}" == "$DEP_YES" ] ; then
 		echo ">>>> Node $NODE: Installing"
 		echo $CONSOLE_BR
 		cd $NODE/
@@ -434,11 +433,11 @@ if [[ $ROLE ]]; then
 		# Run 1g_update to create simlinks and copy files to local for first time 
 		#############################
 				
-		DEFAULT="y"
+		DEFAULT=$DEP_NODE
 		echo $CONSOLE_HL
-		read -e -p ":::: Run 1g_update program to update files in node directory ($NODE)  ? [N/y/q] ": PROCEED
+		read -e -p ":::: Run 1g_update program to update files in node directory ($NODE) ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NODE)": PROCEED
 		PROCEED="${PROCEED:-${DEFAULT}}"
-		if [ "${PROCEED}" == "y" ] ; then 
+		if [ "${PROCEED}" == "$DEP_YES" ] ; then 
 		   echo ">>>> Run 1g_update.sh" 
 		   echo $CONSOLE_BR 
 
