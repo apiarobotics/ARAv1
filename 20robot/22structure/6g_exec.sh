@@ -29,6 +29,7 @@ getVars "./Global"
 getVars "./Role"
 getVars "./Node"
 
+source /ros_entrypoint.sh
 
 ########################################################################
 # Proceeding deployement: execute scripts 7 -> 9 
