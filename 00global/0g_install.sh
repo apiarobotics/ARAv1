@@ -191,21 +191,22 @@ swarmInstall (){
     
     echo "**** Deploying: Swarm"
     echo "#### ROLE = "$ROLE
-    echo "#### SWARM = "$SWARM"
-    echo "#### MASTER_ROLE = "$MASTER_ROLE"
+    echo "#### SWARM = "$SWARM
+    echo "#### MASTER_ROLE = "$MASTER_ROLE
     echo $CONSOLE_BR
 
     #### looking for existing Swarm
-
+    SWARM_STATE=$(docker info --format '{{.Swarm.LocalNodeState}}')
 	
-    #### Swarm mode cluster: role is master (INIT)
-    #if [ $ROLE = $MASTER_ROLE ]; then
-    if [ $SWARM = $ ]; then
+    if $SWARM_STATE = "inactive"; then
+        
+	echo "#### Swarm mode has not been detected yet"
+        echo $CONSOLE_BR
 	
 	#### INIT confirmation ? 
 	DEFAULT="N"
 	echo $CONSOLE_HL 
-	read -e -p ":::: Do you want to INIT new swarm cluster ? [N/y/q] ": PROCEED
+	read -e -p ":::: INIT new swarm cluster ? [N/y/q] ": PROCEED
 	PROCEED="${PROCEED:-${DEFAULT}}"
 		
 	#### run swarm init 
