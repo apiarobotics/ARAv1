@@ -272,7 +272,7 @@ vnetworkCreate () {
     echo ">>>> Docker: Creating network named '$NET_NAME'"
     echo $CONSOLE_BR
 	   
-    if $SWARM=$DEP_YES; then
+    if [ "$SWARM" == "$DEP_YES" ]; then
          NET_SWARM = "--d overlay "
     else
 	 NET_SWARM = ""
@@ -311,7 +311,7 @@ vnetworkInstall () {
     NET_CHECK=$(sudo docker network inspect $NET_NAME --format {{.Name}})
 
     # if same network already exists: master -> delete / other -> join 
-    if [ $NET_CHECK != "" && $NET_CHECK = $NET_ACT ]; then
+    if [-z $NET_CHECK] && [$NET_CHECK == $NET_NAME]; then
 
        echo "#### NET_NAME = $NET_NAME"
        echo "#### NET_CHECK = $NET_CHECK"
@@ -539,7 +539,10 @@ if [[ $ROLE ]]; then
 	    if [ "${PROCEED}" == "$DEP_YES" ] ; then
 		echo ">>>> Node $NODE: Installing"
 		echo $CONSOLE_BR
+                
+		#Go to Node Folder
 		cd $NODE/
+		
 		#ROOT_PATH="../$ROOT_PATH"
 		echo "#### root_path: $ROOT_PATH"
 		echo "#### role_path: $ROLE"
@@ -569,7 +572,9 @@ if [[ $ROLE ]]; then
 		   echo "#### 1g_update program running aborded !"
 		fi
 		echo $CONSOLE_BR 
-
+                
+		# Escape from Node folder
+	        cd ../ 
 
 		#############################
 		# Finishing program  
@@ -580,7 +585,7 @@ if [[ $ROLE ]]; then
 	    else
 		echo "#### Installation $NODE aborded !"
 	    fi
-	    echo $CONSOLE_BR 
+	    echo $CONSOLE_BR
 	    #fi
         done
 

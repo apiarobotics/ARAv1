@@ -1,1 +1,1 @@
-../.././00_Global/2g_proceed.sh
+/home/ubuntu/ARAv1/00global/2g_proceed.sh

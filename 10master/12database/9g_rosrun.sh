@@ -36,21 +36,26 @@ case "$NODE_ROLE" in
             ########################################################################
             echo ">>>> Starting $NODE_NAME with $ROSRUN_EXE command"
             echo $CONSOLE_BR 
+	    
+	    echo "~~~~ execute: source catkin_ws/devel/setup.bash"
+	    #(set -x; source catkin_ws/devel/setup.bash)
+	    source catkin_ws/devel/setup.bash
             
-            cd catkin_ws/src/
-            echo "~~~~ go to $(pwd)"
-            echo $CONSOLE_BR 
+            echo "~~~~ go to: catkin_ws/src"
+	    (set -x; cd catkin_ws/src)
+	    echo $(pwd)
+            echo $CONSOLE_BR
             
-            echo "#### ROS_MASTER_URI = $ROS_MASTER_URI"
-            echo $CONSOLE_BR 
-            
-	    echo "~~~~ execute rosrun (node_name: $NODE_NAME, rosrun_exe: $ROSRUN_EXE)"
-	    (set -x; rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE)
+	    echo "~~~~ execute: rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE"
+	    #(set -x; rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE)
+	    rosrun $ROSPKG_PRE""$NODE_NAME $ROSRUN_EXE
             echo $CONSOLE_BR 
             
             echo "#### $NODE_NAME finished"
             echo $CONSOLE_BR 
-             
+
+            export ROS_MASTER_URI=$ROS_MASTER_URI
+
             exit 1
 esac
     

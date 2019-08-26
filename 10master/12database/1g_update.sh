@@ -1,1 +1,1 @@
-/home/ubuntu/ARAv1/00_Global/1g_update.sh
+/home/ubuntu/ARAv1/00global/1g_update.sh
