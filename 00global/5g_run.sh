@@ -30,7 +30,7 @@ echo $CONSOLE_BR
 # ADD "--net " docker command and select default or other network name:
 #if $DOCKER_NET == Default : echo $NET_NAME
 #else echo $DOCKER_NET
-if [-z $DOCKER_NET]; then
+if [ -z "$DOCKER_NET" ]; then
 	case "$DOCKER_NET" in
 	    "Default" )
 		    DOCKER_NET="--net $NET_NAME"

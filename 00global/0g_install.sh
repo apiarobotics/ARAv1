@@ -273,12 +273,12 @@ vnetworkCreate () {
     echo $CONSOLE_BR
 	   
     if [ "$SWARM" == "$DEP_YES" ]; then
-         NET_SWARM = "--d overlay "
+         NET_SWARM="--d overlay "
     else
-	 NET_SWARM = ""
+	 NET_SWARM=""
     fi
 
-    if $(set -x(sudo docker network create $NET_SWARM $NET_NAME)); then
+    if $( set -x( sudo docker network create $NET_SWARM $NET_NAME)); then
 	 echo "#### Docker network: $?"
     else
          echo "!!!! Network creation doesn't work !"
@@ -311,7 +311,7 @@ vnetworkInstall () {
     NET_CHECK=$(sudo docker network inspect $NET_NAME --format {{.Name}})
 
     # if same network already exists: master -> delete / other -> join 
-    if [-z $NET_CHECK] && [$NET_CHECK == $NET_NAME]; then
+    if [ -z $NET_CHECK ] && [ "$NET_CHECK" = "$NET_NAME" ]; then
 
        echo "#### NET_NAME = $NET_NAME"
        echo "#### NET_CHECK = $NET_CHECK"
