@@ -441,6 +441,19 @@ if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
 	echo $CONSOLE_BR 
 fi
 
+#############################
+# If choice != 11roscore -> check 11roscore already exists:
+# master.host exists ? used to enable ROS communication
+# docker ps 11roscore exists ? check with docker if 11roscore is running
+# if yes -> follow
+# else ask user
+#############################
+
+if [ $ROLE != "1" ]; then
+
+else
+
+fi
 
 #############################
 # Deploy host role 
