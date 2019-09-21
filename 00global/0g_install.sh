@@ -278,10 +278,10 @@ vnetworkCreate () {
 	 NET_SWARM=""
     fi
 
-    if $( set -x( sudo docker network create $NET_SWARM $NET_NAME)); then
-	 echo "#### Docker network: $?"
+    if (sudo docker network create $NET_SWARM $NET_NAME); then
+	 echo "#### Docker network OK !"
     else
-         echo "!!!! Network creation doesn't work !"
+         echo "!!!! Docker network creation doesn't work !"
     fi
     echo $CONSOLE_BR
 
@@ -308,17 +308,20 @@ vnetworkInstall () {
     APP_SUBNET=$2
 
     # check if network with same name already exixts
+    echo ">>>> Docker: Checking if network ('$NET_NAME') already exists ?"
     NET_CHECK=$(sudo docker network inspect $NET_NAME --format {{.Name}})
 
+    if [[ "$NET_CHECK" == "$NET_NAME" ]]; then
     # if same network already exists: master -> delete / other -> join 
-    if [ -z $NET_CHECK ] && [ "$NET_CHECK" = "$NET_NAME" ]; then
 
        echo "#### NET_NAME = $NET_NAME"
        echo "#### NET_CHECK = $NET_CHECK"
+       echo "#### Result = MATCH !"
+       echo ">>>> Docker: Network ('$NET_NAME') already exists !"
        
        DEFAULT=$DEP_VNET_RE
        echo $CONSOLE_HL
-       read -e -p ":::: Confirm renew network '$NET_NAME' [$DEP_YES] or [$DEP_QUIT] to quit (Default: $DEP_VNET_RE": PROCEED
+       read -e -p ":::: Confirm renew network '$NET_NAME' [$DEP_YES] or [$DEP_QUIT] to quit (Default: $DEP_VNET)": PROCEED
        PROCEED="${PROCEED:-${DEFAULT}}"
        
        if [ "${PROCEED}" == "$DEP_YES" ] ; then
