@@ -25,9 +25,9 @@ getVars () {
 # Define vars
 ###
 
-getVars "./Global"
-getVars "./Role"
-getVars "./Node"
+getVars "./global.conf"
+getVars "./role.conf"
+getVars "./node.conf"
 
 source /ros_entrypoint.sh
 

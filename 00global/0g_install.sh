@@ -15,6 +15,9 @@ echo "global_path= "$GLOBAL_PATH
 
 echo "network_file= "$NET_FILE_NAME
 
+read -p "Press enter to continue"
+clear
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~ Autor: Adrien Beaudrey
@@ -55,6 +58,9 @@ pushNetwork (){
 	echo "# MASTER_ROLE = "$MASTER_ROLE
 	echo $CONSOLE_BR
 
+	read -p "Press enter to continue"
+	clear
+
 	#if [ $ROLE = $MASTER_ROLE ]; then
 	#	sudo ssh-keygen -t rsa -b 4096 -f ~/.ssh/master.key -C "master key"
 	#fi
@@ -64,10 +70,20 @@ pushNetwork (){
 	##
 
 	# edit FILEHOSTNAME (/etc/hostname)    
-	sudo chmod 777 $FILEHOSNAMET
-	sudo echo "$ROLE" > $FILEHOSTNAME
-	sudo chmod 644 $FILEHOSTNAME
-	cat $FILEHOSNAME
+	echo "Edit "$FILEHOSTNAME
+	cat $FILEHOSTNAME
+	sudo chmod 777 $FILEHOSTNAME
+	if [ $? -eq 0 ]
+	then
+		sudo echo "$ROLE" > $FILEHOSTNAME
+		if [ $? -eq 0 ]
+		then
+			sudo chmod 644 $FILEHOSTNAME
+		fi
+	fi
+	cat $FILEHOSTNAME
+	read -p "Press enter to continue"
+	clear
 
 	# edit HOSTS (/etc/hosts)    
 	sudo chmod 777 $FILEHOSTS
@@ -77,30 +93,30 @@ pushNetwork (){
 	# Get variables from network.conf file
 	getVars $ROOT_PATH""$GLOBAL_PATH"network.conf" "APP_NAME"
 	echo $CONSOLE_BR 
-	
+
 	echo "# Network values from $NET_PATH are: "
-#	while IFS='' read -r line || [[ -n "$line" ]]; do
-#
-		#if line in file starts by ???; then
-#		echo $v" # $line"
-#		VAR_IP="${line%%=*}"
-#		temp="${line%=}"
-#		temp2="${temp##*=}"
-#		temp3="${temp2%\"}"
-#		temp4="${temp3#\"}"
-#		VAR_HOST=$temp4
-#
-#		((v++))
-		#fi
+	#	while IFS='' read -r line || [[ -n "$line" ]]; do
+	#
+	#if line in file starts by ???; then
+	#		echo $v" # $line"
+	#		VAR_IP="${line%%=*}"
+	#		temp="${line%=}"
+	#		temp2="${temp##*=}"
+	#		temp3="${temp2%\"}"
+	#		temp4="${temp3#\"}"
+	#		VAR_HOST=$temp4
+	#
+	#		((v++))
+	#fi
 
-#		sudo echo "$VAR_IP $VAR_HOST" >> $FILEHOSTS 
+	#		sudo echo "$VAR_IP $VAR_HOST" >> $FILEHOSTS 
 
-		#if [ $ROLE = $MASTER_ROLE ]; then
-		#	sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
-		#	echo "# copy certificate on others"
-		#fi
+	#if [ $ROLE = $MASTER_ROLE ]; then
+	#	sudo ssh-copy-id -i ~/.ssh/master.key.pub ubuntu@$VAR_IP
+	#	echo "# copy certificate on others"
+	#fi
 
-#	done < "$NET_PATH"
+	#	done < "$NET_PATH"
 
 	cat $FILEHOSTS
 	sudo chmod 644 $FILEHOSTS
@@ -119,6 +135,8 @@ pushNetwork (){
 	cat $FILEDHCPCD
 
 	echo $CONSOLE_BR
+	read -p "Press enter to continue"
+	clear
 }
 
 
@@ -137,7 +155,7 @@ getVars (){
 
 	if grep -q $PATTERN $VARS_PATH; then
 		# path:
-		(set -x; /bin/bash $VARS_PATH)
+		#	(set -x; /bin/bash $VARS_PATH)
 
 		# read file 
 		#echo "# Param values from $VARS_PATH are: "
@@ -181,7 +199,6 @@ checkPrereq (){
 		rm -rf ./get-docker.sh
 	fi
 	echo $CONSOLE_BR 
-
 }
 
 
@@ -197,6 +214,8 @@ swarmInstall (){
 	echo "# MASTER_ROLE = "$MASTER_ROLE
 	echo $CONSOLE_BR
 
+	read -p "Press enter to continue"
+	clear
 	# looking for existing Swarm
 	SWARM_STATE=$(docker info --format '{{.Swarm.LocalNodeState}}')
 
@@ -260,9 +279,7 @@ swarmInstall (){
 		fi
 
 	fi
-
 }
-
 
 
 vnetworkCreate () {
@@ -285,7 +302,7 @@ vnetworkCreate () {
 		--subnet=192.168.1.0/25 \
 		--gateway=192.168.1.100 \
 		--aux-address="10master=192.168.1.1" \
-	$NET_SWARM $NET_NAME)
+		$NET_SWARM $NET_NAME)
 
 	if [ $NET_CREATE_RESULT ]; then
 		echo "# Docker network OK !"
@@ -293,7 +310,6 @@ vnetworkCreate () {
 		echo "!!!! Docker network creation doesn't work !"
 	fi
 	echo $CONSOLE_BR
-
 }
 
 vnetworkDelete () {
@@ -304,7 +320,6 @@ vnetworkDelete () {
 	echo $CONSOLE_BR
 	echo "# Docker network: $(sudo docker network rm $NET_NAME) removed !" 
 	echo $CONSOLE_BR
-
 }
 
 vnetworkInstall () {
@@ -328,6 +343,9 @@ vnetworkInstall () {
 		echo "# Result = MATCH !"
 		echo "> Docker: Network ('$NET_NAME') already exists !"
 
+		read -p "Press enter to continue"
+		clear
+
 		DEFAULT=$DEP_VNET_RE
 		echo $CONSOLE_HL
 		read -e -p ": Confirm renew network '$NET_NAME' [$DEP_YES] or [$DEP_QUIT] to quit (Default: $DEP_VNET)": PROCEED
@@ -345,7 +363,6 @@ vnetworkInstall () {
 	else # if network doesn't exist -> create it
 		vnetworkCreate $NET_NAME $APP_SUBNET 
 	fi
-
 }
 
 
@@ -359,7 +376,8 @@ vnetworkInstall () {
 
 getVars $ROOT_PATH""$GLOBAL_PATH"global.conf" "APP_NAME"
 echo $CONSOLE_BR 
-
+read -p "Press enter to continue"
+clear
 
 ##
 # Intro message
@@ -371,14 +389,14 @@ echo " *************** "
 echo "# please refer to apiarobotics.com to get informed for $APP_NAME updates or new services"
 echo $CONSOLE_BR
 
-
 ##
 # Run checkPrereq function 
 ##
 
 checkPrereq
 echo $CONSOLE_BR
-
+read -p "Press enter to continue"
+clear
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++ SELECT ROLE
@@ -443,11 +461,14 @@ if [[ "$PROCEED" =~ ^[1-6]+$ ]]; then
 	#echo "n = $n"
 	ROLE=${ROLES[$n]}
 
-	echo "# your choice is : $ROLE ##"
+	echo "# your choice is : $ROLE "
 	echo $CONSOLE_BR 
 
 	getVars $ROOT_PATH""$ROLE"/role.conf" "ROLE_NAME"
 	echo $CONSOLE_BR 
+
+	read -p "Press enter to continue"
+	clear
 fi
 
 ##
@@ -458,9 +479,9 @@ fi
 ##
 
 #if role is not Master (roscore)
-if [ $ROLE != "1" ]; then
+if [ "$ROLE" != "$MASTER_ROLE" ]; then
 	#Catch Master (roscore) IP to include in hosts file
-	MASTER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 11roscore)
+	MASTER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $ROS_MASTER)
 
 	echo "# MASTER_IP="$MASTER_IP
 
@@ -478,159 +499,172 @@ if [ $ROLE != "1" ]; then
 			exit
 		fi
 	fi
+fi
+
+##
+# Deploy host role 
+##
+
+# go to "role" folder and run "build" script
+if [[ $ROLE ]]; then
+
+	echo "> Starting installer program for $ROLE"
+	echo $CONSOLE_BR
+	# go to $ROLE folder:
+	cd $ROLE/
+	#ROOT_PATH="../$ROOT_PATH"
+	echo "# root_path: $ROOT_PATH"
+	echo "# role_path: $ROLE"
+	echo "# pwd: $(pwd)"
+	echo $CONSOLE_BR
+
+	read -p "Press enter to continue"
+	clear
 
 	##
-	# Deploy host role 
+	# Setup network 
 	##
+	# Network config file is stored in Global folder: /00global/
 
-	# go to "role" folder and run "build" script
-	if [[ $ROLE ]]; then
+	echo $CONSOLE_HL
+	DEFAULT=$DEP_NET
+	read -e -p ": Setup host network ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NET):" PROCEED
+	PROCEED="${PROCEED:-${DEFAULT}}"
+	if [ "${PROCEED}" == "$DEP_YES" ]; then
+		pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""$NET_FILE_NAME
+	else
+		echo "# Network setup aborded !"
+	fi
+	echo $CONSOLE_BR 
 
-		echo "> Starting installer program for $ROLE"
-		echo $CONSOLE_BR
-		# go to $ROLE folder:
-		cd $ROLE/
-		#ROOT_PATH="../$ROOT_PATH"
-		echo "# root_path: $ROOT_PATH"
-		echo "# role_path: $ROLE"
-		echo "# pwd: $(pwd)"
-		echo $CONSOLE_BR
+	clear
 
+	##
+	# Deploy swarm 
+	##	
+
+	echo $CONSOLE_HL 
+	DEFAULT=$DEP_NET
+	read -e -p ": Deploy swarm ? [N/y/q] ": PROCEED
+	PROCEED="${PROCEED:-${DEFAULT}}"
+	if [ "${PROCEED}" == "$DEP_YES" ]; then
+		swarmInstall $ROLE
+	else
+		echo "# Swarm deploy aborded !"
+	fi
+	echo $CONSOLE_BR 
+
+	clear
+
+	##
+	# Install virtual network (Docker) 
+	##	
+
+	echo $CONSOLE_HL 
+	DEFAULT=$DEP_VNET
+	read -e -p ": Install virtual network ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_VNET)": PROCEED
+	PROCEED="${PROCEED:-${DEFAULT}}"
+	if [ "${PROCEED}" == "$DEP_YES" ] ; then 
+		vnetworkInstall $NET_NAME $APP_SUBNET
+	else
+		echo "# Virtual network install aborded !"
+	fi
+	echo $CONSOLE_BR 
+
+	clear
+
+	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	#++++++++++ SCAN NODES (for ROLE selected)
+	#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	# for each folder (node) inside role root folder: 
+	for NODE in [1-9]*; do
+
+		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		#++++++++++ RUN NODE 
+		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+		#echo "+++++++++++ NODE: $NODE +++++++++++"
+		#echo $CONSOLE_BR
 
 		##
-		# Setup network 
+		# Define NODE vars 
 		##
-		# Network config file is stored in Global folder: /00global/
 
+		# VARS for NODE are stored in "node.conf" file include in each node folder for each role 
+		getVars $NODE"/node.conf" "NODE_NAME"
+		echo $CONSOLE_BR
+
+		# test folder is patern validated:
+		#if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
+		# yes folder name follows patern
+
+		DEFAULT=$DEP_ROLE
 		echo $CONSOLE_HL
-		DEFAULT=$DEP_NET
-		read -e -p ": Setup host network ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NET):" PROCEED
+		read -e -p ": Proceed $NODE installation ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_ROLE)": PROCEED 
 		PROCEED="${PROCEED:-${DEFAULT}}"
-		if [ "${PROCEED}" == "$DEP_YES" ]; then
-			pushNetwork $ROLE $ROOT_PATH""$GLOBAL_PATH""$NET_FILE_NAME
-		else
-			echo "# Network setup aborded !"
-		fi
-		echo $CONSOLE_BR 
+		if [ "${PROCEED}" == "$DEP_YES" ] ; then
+			echo "> Node $NODE: Installing"
+			echo $CONSOLE_BR
 
+			#Go to Node Folder
+			cd $NODE/
 
-		##
-		# Deploy swarm 
-		##	
+			#ROOT_PATH="../$ROOT_PATH"
+			echo "# root_path: $ROOT_PATH"
+			echo "# role_path: $ROLE"
+			echo "# node_path: $NODE"
+			echo "# pwd: $(pwd)"
+			echo $CONSOLE_BR
 
-		echo $CONSOLE_HL 
-		DEFAULT=$DEP_NET
-		read -e -p ": Deploy swarm ? [N/y/q] ": PROCEED
-		PROCEED="${PROCEED:-${DEFAULT}}"
-		if [ "${PROCEED}" == "$DEP_YES" ]; then
-			swarmInstall $ROLE
-		else
-			echo "# Swarm deploy aborded !"
-		fi
-		echo $CONSOLE_BR 
+			read -p "Press enter to continue"
 
-
-		##
-		# Install virtual network (Docker) 
-		##	
-
-		echo $CONSOLE_HL 
-		DEFAULT=$DEP_VNET
-		read -e -p ": Install virtual network ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_VNET)": PROCEED
-		PROCEED="${PROCEED:-${DEFAULT}}"
-		if [ "${PROCEED}" == "$DEP_YES" ] ; then 
-			vnetworkInstall $NET_NAME $APP_SUBNET
-		else
-			echo "# Virtual network install aborded !"
-		fi
-		echo $CONSOLE_BR 
-
-
-		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		#++++++++++ SCAN NODES (for ROLE selected)
-		#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-		# for each folder (node) inside role root folder: 
-		for NODE in [1-9]*; do
-
-			#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-			#++++++++++ RUN NODE 
-			#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-			#echo "+++++++++++ NODE: $NODE +++++++++++"
+			#echo "ROSRUN_EXE=$ROSRUN_EXE"
 			#echo $CONSOLE_BR
 
 			##
-			# Define NODE vars 
+			# Run 1g_update to create simlinks and copy files to local for first time 
 			##
 
-			# VARS for NODE are stored in "node.conf" file include in each node folder for each role 
-			getVars $NODE"/node.conf" "NODE_NAME"
-			echo $CONSOLE_BR
-
-			# test folder is patern validated:
-			#if [[ "$NODE" =~ [â-zA-Zà-9\ ] ]]; then
-			# yes folder name follows patern
-
-			DEFAULT=$DEP_ROLE
+			DEFAULT=$DEP_NODE
 			echo $CONSOLE_HL
-			read -e -p ": Proceed $NODE installation ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_ROLE)": PROCEED 
+			read -e -p ": Run 1g_update program to update files in node directory ($NODE) ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NODE)": PROCEED
 			PROCEED="${PROCEED:-${DEFAULT}}"
-			if [ "${PROCEED}" == "$DEP_YES" ] ; then
-				echo "> Node $NODE: Installing"
-				echo $CONSOLE_BR
-
-				#Go to Node Folder
-				cd $NODE/
-
-				#ROOT_PATH="../$ROOT_PATH"
-				echo "# root_path: $ROOT_PATH"
-				echo "# role_path: $ROLE"
-				echo "# node_path: $NODE"
-				echo "# pwd: $(pwd)"
-				echo $CONSOLE_BR
-
-				#echo "ROSRUN_EXE=$ROSRUN_EXE"
-				#echo $CONSOLE_BR
-
-				##
-				# Run 1g_update to create simlinks and copy files to local for first time 
-				##
-
-				DEFAULT=$DEP_NODE
-				echo $CONSOLE_HL
-				read -e -p ": Run 1g_update program to update files in node directory ($NODE) ? [$DEP_YES/$DEP_NO/$DEP_QUIT] (Default: $DEP_NODE)": PROCEED
-				PROCEED="${PROCEED:-${DEFAULT}}"
-				if [ "${PROCEED}" == "$DEP_YES" ] ; then 
-					echo "> Run 1g_update.sh" 
-					echo $CONSOLE_BR 
-
-					source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
-
-					echo "# 0_install.sh execution finished" 
-				else
-					echo "# 1g_update program running aborded !"
-				fi
+			if [ "${PROCEED}" == "$DEP_YES" ] ; then 
+				echo "> Run 1g_update.sh" 
 				echo $CONSOLE_BR 
 
-				# Escape from Node folder
-				cd ../ 
+				source $ROOT_PATH""$GLOBAL_PATH"/1g_update.sh"
 
-				##
-				# Finishing program  
-				##
-
-
-				echo "# Node $NODE: Installation done"
+				echo "# 0_install.sh execution finished" 
 			else
-				echo "# Installation $NODE aborded !"
+				echo "# 1g_update program running aborded !"
 			fi
-			echo $CONSOLE_BR
-			#fi
-		done
+			echo $CONSOLE_BR 
 
-	else
-		echo "# invalid entry, please relaunch program after terminating"
+			read -p "Press enter to continue"
+			clear
+
+
+			# Escape from Node folder
+			cd ../ 
+
+			##
+			# Finishing program  
+			##
+
+
+			echo "# Node $NODE: Installation done"
+		else
+			echo "# Installation $NODE aborded !"
+		fi
 		echo $CONSOLE_BR
-	fi
+		read -p "Press enter to continue"
+		clear
+		#fi
+	done
+
+else
+	echo "# invalid entry, please relaunch program after terminating"
+	echo $CONSOLE_BR
 fi
