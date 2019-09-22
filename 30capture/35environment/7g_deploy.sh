@@ -1,22 +1,22 @@
 #!/bin/bash
 
-########################################################################
+###
 # Define vars
-########################################################################
+###
 
 echo "CATKIN = $CATKIN"
 
 if [ "$CATKIN" ==  "Yes" ]; then
     
-    echo ":::: Deploy application with Catkin"
+    echo ": Deploy application with Catkin"
     echo $CONSOLE_BR
     
-    ########################################################################
+    ###
     # Deploy app 
-    ########################################################################
+    ###
     
     echo $CONSOLE_BR
-    echo ">>>> Starting $NODE_NAME deploy process"
+    echo "> Starting $NODE_NAME deploy process"
     
     echo "~~~~ source ROS opt/ros/melodic/setup.bash"
     source /opt/ros/melodic/setup.bash
@@ -58,10 +58,10 @@ if [ "$CATKIN" ==  "Yes" ]; then
         source devel/setup.bash
 
 else
-    echo "#### No catkin pak to deploy"
+    echo "# No catkin pak to deploy"
 fi        
 
 echo $CONSOLE_BR
-echo "#### Application $NODE_NAME deploy processing finished"
+echo "# Application $NODE_NAME deploy processing finished"
 
 

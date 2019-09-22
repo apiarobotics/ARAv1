@@ -1,8 +1,0 @@
-APP_NAME="ara"
-APP_VERSION="0.1"
-ROS_MASTER_URI="http://172.18.0.2:11311/"
-SWARM_MANAGER_IP=""
-DOCKER_CMD="6g_deploy.sh"
-CONSOLE_BR="...."
-CONSOLE_HL="~~~~~~~~~~~~~~~~~~~~~"
-

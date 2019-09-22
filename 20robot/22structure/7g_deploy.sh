@@ -1,25 +1,25 @@
 #!/bin/bash
 
-########################################################################
+###
 # Define vars
-########################################################################
+###
 
 #. ./Local
 #. ./Global
 
 
-########################################################################
+###
 # Deploy app 
-########################################################################
+###
 
 #echo "CATKIN = $CATKIN"
 
 if [ "$CATKIN" ==  "Yes" ]; then
     
-    echo ":::: Deploy application with Catkin"
+    echo ": Deploy application with Catkin"
         echo $CONSOLE_BR
     
-	echo ">>>> Starting ($ROSPKG_PRE)$NODE_NAME deploy process"
+	echo "> Starting ($ROSPKG_PRE)$NODE_NAME deploy process"
         echo $CONSOLE_BR
     
     echo "~~~~ source ROS opt/ros/melodic/setup.bash"
@@ -62,10 +62,10 @@ if [ "$CATKIN" ==  "Yes" ]; then
     source devel/setup.bash
 
 else
-    echo "#### No catkin pack to deploy"
+    echo "# No catkin pack to deploy"
 fi        
 echo $CONSOLE_BR
 
-echo "#### Application ($ROSPKG_PRE)$NODE_NAME deploy processing finished"
+echo "# Application ($ROSPKG_PRE)$NODE_NAME deploy processing finished"
 echo $CONSOLE_BR
 
